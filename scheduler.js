@@ -18,6 +18,10 @@ function nextHour(hour) {
   if (next <= now) next.setDate(next.getDate() + 1);
   return next;
 }
+// Helper : retourne la date dans X minutes
+function inMinutes(minutes) {
+  return new Date(Date.now() + minutes * 60 * 1000);
+}
 console.log('=== BlueBot Scheduler started! (Render log test) ===');
 // Initialise la base de données locale pour stocker l'état des jobs
 const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
@@ -30,7 +34,7 @@ jobs.schedule(async () => {
   console.log('[BlazeJob] [END] Job image Clippy 8h');
 }, {
   name: 'Trombone Image Post 8h',
-  runAt: nextHour(8),
+  runAt: inMinutes(3), // Démarre dans 3 minutes
   interval: 24 * 60 * 60 * 1000,
   maxRuns: 3650,
 });
@@ -45,7 +49,7 @@ for (let i = 0; i < 9; i++) {
     console.log(`[BlazeJob] [END] Job texte Clippy ${9 + i}h`);
   }, {
     name: `Trombone Text Post ${9 + i}h`,
-    runAt: nextHour(9 + i),
+    runAt: inMinutes(3), // Démarre dans 3 minutes
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
@@ -67,7 +71,7 @@ for (const hour of [7, 19]) {
     console.log(`[BlazeJob] [END] Job like/follow ${hour}h`);
   }, {
     name: `Buyer Like & Follow ${hour}h`,
-    runAt: nextHour(hour),
+    runAt: inMinutes(3), // Démarre dans 3 minutes
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
