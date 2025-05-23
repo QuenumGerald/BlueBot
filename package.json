@@ -1,0 +1,16 @@
+{
+  "name": "clippy-bluesky-bot",
+  "version": "1.0.0",
+  "description": "Bot Bluesky Clippy avec génération d'image et de texte IA, scheduler et interactions automatiques.",
+  "type": "module",
+  "main": "scheduler.js",
+  "scripts": {
+    "start": "node scheduler.js"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.14.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "blazerjob": "1.0.1"
+  }
+}
