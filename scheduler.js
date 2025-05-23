@@ -28,13 +28,15 @@ const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
 
 // Planifie 3 jobs journaliers pour publier un post Clippy à 9h, 15h et 21h
 // 1 post image "trombone plage/retraite" chaque jour à 8h
+const isTest = process.env.NODE_ENV === 'test';
+
 jobs.schedule(async () => {
   console.log('[BlazeJob] [START] Job image Clippy 8h');
   await postTromboneImage();
   console.log('[BlazeJob] [END] Job image Clippy 8h');
 }, {
   name: 'Trombone Image Post 8h',
-  runAt: inMinutes(3), // Démarre dans 3 minutes
+  runAt: isTest ? inMinutes(3) : nextHour(8),
   interval: 24 * 60 * 60 * 1000,
   maxRuns: 3650,
 });
@@ -49,7 +51,7 @@ for (let i = 0; i < 9; i++) {
     console.log(`[BlazeJob] [END] Job texte Clippy ${9 + i}h`);
   }, {
     name: `Trombone Text Post ${9 + i}h`,
-    runAt: inMinutes(3), // Démarre dans 3 minutes
+    runAt: isTest ? inMinutes(3) : nextHour(9 + i),
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
@@ -71,7 +73,7 @@ for (const hour of [7, 19]) {
     console.log(`[BlazeJob] [END] Job like/follow ${hour}h`);
   }, {
     name: `Buyer Like & Follow ${hour}h`,
-    runAt: inMinutes(3), // Démarre dans 3 minutes
+    runAt: isTest ? inMinutes(3) : nextHour(hour),
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
