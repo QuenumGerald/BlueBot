@@ -24,7 +24,11 @@ const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
 
 // Planifie 3 jobs journaliers pour publier un post Clippy à 9h, 15h et 21h
 // 1 post image "trombone plage/retraite" chaque jour à 8h
-jobs.schedule(postTromboneImage, {
+jobs.schedule(async () => {
+  console.log('[BlazeJob] [START] Job image Clippy 8h');
+  await postTromboneImage();
+  console.log('[BlazeJob] [END] Job image Clippy 8h');
+}, {
   name: 'Trombone Image Post 8h',
   runAt: nextHour(8),
   interval: 24 * 60 * 60 * 1000,
@@ -34,9 +38,11 @@ jobs.schedule(postTromboneImage, {
 // 9 posts texte courts (sans image) chaque jour de 9h à 17h (total 10 posts/jour)
 for (let i = 0; i < 9; i++) {
   jobs.schedule(async () => {
+    console.log(`[BlazeJob] [START] Job texte Clippy ${9 + i}h`);
     const text = await generateTrombonePostText();
     await agent.post({ text });
-    console.log(`[Succès] Post texte trombone publié à ${9 + i}h !`);
+    console.log(`[BlazeJob][PostTexte] Texte posté à ${9 + i}h :`, text);
+    console.log(`[BlazeJob] [END] Job texte Clippy ${9 + i}h`);
   }, {
     name: `Trombone Text Post ${9 + i}h`,
     runAt: nextHour(9 + i),
@@ -54,9 +60,11 @@ const buyerHashtags = [
 
 for (const hour of [7, 19]) {
   jobs.schedule(async () => {
+    console.log(`[BlazeJob] [START] Job like/follow ${hour}h`);
     for (const hashtag of buyerHashtags) {
       await likeAndFollowHashtag(hashtag, 25);
     }
+    console.log(`[BlazeJob] [END] Job like/follow ${hour}h`);
   }, {
     name: `Buyer Like & Follow ${hour}h`,
     runAt: nextHour(hour),
@@ -69,25 +77,6 @@ for (const hour of [7, 19]) {
 // Démarre le scheduler
 jobs.start();
 
-// Log tous les événements importants de BlazeJob
-jobs.on('jobStarted', (job) => {
-  console.log(`[BlazeJob] Job démarré : ${job.name}`);
-});
-jobs.on('jobEnded', (job) => {
-  console.log(`[BlazeJob] Job terminé : ${job.name}`);
-});
-jobs.on('jobFailed', (job, err) => {
-  console.error(`[BlazeJob] Job échoué : ${job.name} - Erreur :`, err);
-});
-jobs.on('jobScheduled', (job) => {
-  console.log(`[BlazeJob] Job planifié : ${job.name} pour ${job.runAt}`);
-});
-jobs.on('jobRescheduled', (job) => {
-  console.log(`[BlazeJob] Job replanifié : ${job.name} pour ${job.runAt}`);
-});
-jobs.on('jobCancelled', (job) => {
-  console.log(`[BlazeJob] Job annulé : ${job.name}`);
-});
 
 // Logue quand toutes les tâches planifiées sont terminées
 jobs.onAllTasksEnded(() => {
