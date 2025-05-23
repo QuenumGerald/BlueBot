@@ -4,7 +4,7 @@
 import { agent } from './bluesky.js';
 
 // Fonction utilitaire pour temporiser
-function delay(ms) {
+export function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -16,7 +16,7 @@ function delay(ms) {
  * @param {string} hashtag - Hashtag sans # (ex: 'clippy')
  * @param {number} max - Nombre de posts à traiter (par défaut 5)
  */
-export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5) {
+export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5, delayMs = 2000) {
   try {
     // Recherche les derniers posts contenant le hashtag
     console.log(`[BlazeJob][INFO] Recherche des posts pour le hashtag #${hashtag} (max ${max})`);
@@ -55,7 +55,7 @@ export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5) {
       } catch (err) {
         console.error(`[BlazeJob][Follow] Échec : ${author.handle} ->`, err?.response?.data || err.message);
       }
-      await delay(1000);
+      await delay(delayMs);
     }
     console.log(`[BlazeJob][INFO] Fin du traitement des posts pour #${hashtag}`);
   } catch (err) {
