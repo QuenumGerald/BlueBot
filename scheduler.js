@@ -47,15 +47,8 @@ for (let i = 0; i < 9; i++) {
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const buyerHashtags = [
   'clippy',
-  'clippycoin',
-  'crypto',
   'memecoin',
   'tech',
-  'ai',
-  'blockchain',
-  'web3',
-  'windows',
-  'meme'
 ];
 
 for (const hour of [7, 19]) {
