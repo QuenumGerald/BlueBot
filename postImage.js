@@ -40,7 +40,8 @@ const influencerScenes = [
 const randomScene = influencerScenes[Math.floor(Math.random() * influencerScenes.length)];
 const imagePrompt = `Cartoon drawing of a paperclip character (like Clippy from Microsoft Office), as a social media influencer, ${randomScene}. Style: bright, fun, digital art. ${text}`;
 
-    console.log('[Image] Génération de l’image trombone...');
+    console.log('[BlazeJob][Image] Génération de l’image trombone...');
+console.log(`[BlazeJob][Image] Prompt utilisé : ${imagePrompt}`);
     const imageBuffer = await generateClippyImage(imagePrompt);
     console.log('[Image] Image générée.');
 
@@ -59,9 +60,9 @@ const imagePrompt = `Cartoon drawing of a paperclip character (like Clippy from 
         ],
       },
     });
-    console.log('[Succès] Post trombone publié sur Bluesky !');
+    console.log('[BlazeJob][Succès] Post trombone publié sur Bluesky !');
   } catch (error) {
-    console.error('[Erreur] Échec lors de la publication du post trombone :', error?.response?.data || error.message);
+    console.error('[BlazeJob][Erreur] Échec lors de la publication du post trombone :', error?.response?.data || error.message);
     throw error;
   }
 }

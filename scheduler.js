@@ -18,6 +18,7 @@ function nextHour(hour) {
   if (next <= now) next.setDate(next.getDate() + 1);
   return next;
 }
+console.log('=== BlueBot Scheduler started! (Render log test) ===');
 // Initialise la base de données locale pour stocker l'état des jobs
 const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
 
@@ -67,6 +68,26 @@ for (const hour of [7, 19]) {
 
 // Démarre le scheduler
 jobs.start();
+
+// Log tous les événements importants de BlazeJob
+jobs.on('jobStarted', (job) => {
+  console.log(`[BlazeJob] Job démarré : ${job.name}`);
+});
+jobs.on('jobEnded', (job) => {
+  console.log(`[BlazeJob] Job terminé : ${job.name}`);
+});
+jobs.on('jobFailed', (job, err) => {
+  console.error(`[BlazeJob] Job échoué : ${job.name} - Erreur :`, err);
+});
+jobs.on('jobScheduled', (job) => {
+  console.log(`[BlazeJob] Job planifié : ${job.name} pour ${job.runAt}`);
+});
+jobs.on('jobRescheduled', (job) => {
+  console.log(`[BlazeJob] Job replanifié : ${job.name} pour ${job.runAt}`);
+});
+jobs.on('jobCancelled', (job) => {
+  console.log(`[BlazeJob] Job annulé : ${job.name}`);
+});
 
 // Logue quand toutes les tâches planifiées sont terminées
 jobs.onAllTasksEnded(() => {
