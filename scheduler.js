@@ -74,11 +74,29 @@ const buyerHashtags = [
   'tech',
 ];
 
-// Répartition sur 5 créneaux (7h, 11h, 15h, 19h, 23h), 5 posts/hashtag/job, délai 2s entre chaque action
+// Répartition sur 10 créneaux (2h, 4h, ..., 20h), 5 posts/hashtag/job, délai 2s entre chaque action
 const likeFollowHours = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
 const maxPerJob = 5;
 const delayMs = 2000;
 
+// Planification auto-reply 10 fois/jour (mêmes créneaux)
+import { autoReply } from './autoReply.js';
+for (const hour of likeFollowHours) {
+  jobs.schedule(async () => {
+    try {
+      console.log(`[BlazeJob] [START] Job autoReply ${hour}h`);
+      await autoReply();
+      console.log(`[BlazeJob] [END] Job autoReply ${hour}h`);
+    } catch (err) {
+      console.error(`[BlazeJob][ERROR] Job autoReply ${hour}h :`, err);
+    }
+  }, {
+    name: `AutoReply ${hour}h`,
+    runAt: isTest ? inMinutes(2) : nextHour(hour),
+    interval: 24 * 60 * 60 * 1000,
+    maxRuns: 3650,
+  });
+}
 for (const hour of likeFollowHours) {
   jobs.schedule(async () => {
     try {

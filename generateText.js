@@ -51,34 +51,40 @@ async function callChatApi(messages, maxTokens) {
  * @returns {Promise<string>}
  */
 export async function generateTrombonePostText() {
-  // Liste de thèmes doux et drôles pour la "vie de trombone" en retraite
+  // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
   const topics = [
-    "A paperclip enjoying retirement at the beach",
-    "A trombone sunbathing with sunglasses on a towel",
-    "Paperclip building a sandcastle shaped like an office",
-    "A trombone fishing, thinking about old office days",
-    "Paperclip sipping coconut water under a palm tree",
-    "A trombone learning to surf",
-    "Paperclip reading a book called 'How to Unbend Yourself'",
-    "A trombone playing chess with a crab",
-    "Paperclip writing postcards to old office friends",
-    "A trombone meditating at sunrise",
-    "Paperclip taking a selfie with a starfish",
-    "A trombone painting the sunset",
-    "Paperclip collecting shells for a necklace",
-    "A trombone napping in a hammock",
-    "Paperclip teaching yoga to seashells"
+    "A paperclip accidentally becoming a viral meme on Bluesky",
+    "A trombone giving useless crypto advice to influencers",
+    "Paperclip hacking into a DeFi protocol (badly)",
+    "A trombone reminiscing about the Windows 98 days",
+    "Paperclip launching its own memecoin and failing",
+    "A trombone lost in a sea of hashtags",
+    "Paperclip explaining why it hates Excel",
+    "A trombone dreaming of being an NFT",
+    "Paperclip trying to understand blockchain",
+    "A trombone giving a TED Talk about memes",
+    "Paperclip starting a podcast with Clippy",
+    "A trombone in a heated debate with a stapler",
+    "Paperclip making friends with a USB stick",
+    "A trombone moderating a crypto Discord server",
+    "Paperclip going viral for the wrong reasons",
+    "A trombone teaching meme history to Gen Z",
+    "Paperclip getting banned from Bluesky for spamming",
+    "A trombone trying to get verified",
+    "Paperclip's existential crisis in the cloud",
+    "A trombone writing a tell-all autobiography"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-  const isShort = Math.random() < 0.7;
+  // 40% posts très courts, 60% posts moyens/longs
+  const isShort = Math.random() < 0.4;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, poetic, or funny one-liner for a paperclip's (trombone's) retirement life at the beach, as if it were a drawing or cartoon. Max 10 words. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Clippy (the paperclip/trombone) as a meme. Max 10 words. English only. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short, tender, and funny post (max 200 chars) describing this paperclip's (trombone's) beach retirement life, as if it were a drawing or cartoon. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a short, original, and funny meme post (max 200 chars) for Clippy (the paperclip/trombone) on Bluesky. Avoid the beach/retirement theme. English only. No emoji, no markdown.`;
   }
   const messages = [
-    { role: 'system', content: `You are a poetic, funny, and gentle narrator. Write original, meme-worthy, and tender posts about the life of a paperclip (trombone) in retirement, living at the beach, in the style of a drawing or cartoon. Always in ENGLISH. No emoji, no markdown, no formatting symbols. Most posts must be extremely short (one-liners, max 10 words). Sometimes, write a slightly longer anecdote (max 200 chars). Never repeat the same structure or joke. Always invent something new, with a different topic or image each time.` },
+    { role: 'system', content: `You are a meme-savvy, witty, and creative narrator. Write original, meme-worthy, and clever posts about Clippy (the paperclip/trombone) in the world of social media, memes, and tech. Do NOT focus on the beach or retirement. Always in ENGLISH. No emoji, no markdown, no formatting symbols. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). Never repeat the same structure, joke, or theme. Always invent something new, with a different topic or twist each time.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 200);
@@ -150,7 +156,7 @@ export async function generatePostText() {
  */
 export async function generateReplyText(originalText) {
   const messages = [
-    { role: 'system', content: 'You are Clippy, the sarcastic, meme-loving office assistant. Reply only with a short, sarcastic comment. IMPORTANT: Your answer must be in plain text only. Do NOT use markdown, formatting, bullet points, or emojis. No bold, no italics, no symbols, no lists.' },
+    { role: 'system', content: `You are Clippy, the witty and playful office assistant. Reply ONLY with a short, original, and clever comment (max 200 chars). Mix playful humor, gentle irony, absurd punchlines, or light-hearted fun. NEVER start your reply with "Oh wow", "Ah yes", "Nice", "Great", "Amazing", "Classic", "Sure", "Indeed", "Another", or any repetitive structure. Each reply MUST start differently, with a unique tone, structure, or twist. Sometimes use a rhetorical question, sometimes an absurd analogy, sometimes a fun fact, sometimes a dry joke, sometimes a one-liner. Avoid being mean-spirited or too harsh—keep it light and fun. No repeated formulas, no catchphrases, no templates. Here are examples of good replies: - "If crypto had a horoscope, today would be 'mostly cloudy.'" - "Somewhere, a blockchain is writing its memoirs." - "Is this the part where I ask for your seed phrase?" - "I once tried to explain NFTs to my stapler. It still doesn't get it." - "Now that's what I call a plot twist." - "This post has more layers than my update history." - "I miss the days when bugs were just insects." - "Paperclips unite! Wait, wrong meeting." Do NOT use markdown, formatting, bullet points, or emojis. Only plain text. Each reply must be unique and inventive.` },
     { role: 'user', content: `Réponds de façon sarcastique à ce post : "${originalText}" uniquement en texte brut, sans markdown, sans emoji, sans puces.` }
   ];
   let text = await callChatApi(messages, 200);
