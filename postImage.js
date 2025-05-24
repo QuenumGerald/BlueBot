@@ -20,24 +20,24 @@ export async function postTromboneImage() {
 
     // Prompt image basé sur le texte généré
     // Liste de scènes influenceur pour Clippy
-// Scènes plus précises pour Clippy
+// Scènes pour Clippy reflétant sa reconversion dans la blockchain
 const influencerScenes = [
-  "taking a selfie at a tech conference, classic Microsoft Clippy design with big eyes",
-  "on a beach with sunglasses, authentic Microsoft Office assistant character",
-  "next to a tiny toy sports car, classic paperclip assistant from Microsoft Office",
-  "at a trendy café with a small coffee cup, original Clippy design",
-  "with a smartphone, classic Office assistant character with large eyes",
-  "streaming from a computer, original Microsoft paperclip assistant",
-  "in business class seat, authentic Office Clippy design",
-  "wearing a tiny bowtie, classic Microsoft Office paperclip",
-  "at a crypto event with a small sign, authentic Clippy design",
-  "next to a computer screen, original Microsoft Office assistant"
+  "at a blockchain conference, classic Microsoft Clippy design with big eyes, near a crypto logo",
+  "on a yacht with sunglasses, authentic Microsoft Office assistant character with a tiny hardware wallet",
+  "next to a crypto trading screen, classic paperclip assistant from Microsoft Office",
+  "at a Web3 meetup, original Clippy design with a subtle ethereum logo nearby",
+  "with a smartphone showing a crypto app, classic Office assistant character with large eyes",
+  "streaming a blockchain tutorial, original Microsoft paperclip assistant",
+  "in a modern tech office with blockchain posters, authentic Office Clippy design",
+  "wearing a tiny crypto-themed bowtie, classic Microsoft Office paperclip",
+  "at a crypto event holding a tiny bitcoin, authentic Clippy design",
+  "next to a computer screen showing crypto charts, original Microsoft Office assistant"
 ];
 
 const randomScene = influencerScenes[Math.floor(Math.random() * influencerScenes.length)];
 
-// Prompt amélioré avec des contraintes précises pour obtenir un Clippy authentique
-const imagePrompt = `High-quality digital illustration of the original Microsoft Office Assistant Clippy (the paperclip character) ${randomScene}. IMPORTANT: Clippy must have EXACTLY two eyes, the classic bent paperclip shape, and correct proportions. NO human features except eyes. NO extra limbs. NO TEXT OR WORDS IN THE IMAGE. Style: clean, professional digital art with good lighting.`;
+// Prompt ultra-précis avec description détaillée de Clippy
+const imagePrompt = `Photorealistic digital illustration of the EXACT Microsoft Office Assistant Clippy. Clippy is a THIN METAL PAPERCLIP character with EXACTLY two large oval eyes (black pupils with white surrounding), bent in the classic paperclip shape with the top part forming a rounded triangle like an eyebrow. The paperclip is SHINY SILVER/METALLIC and has a thin wire body. ${randomScene}. EXTREMELY IMPORTANT: Clippy must be IMMEDIATELY RECOGNIZABLE as the original Office Assistant, with the exact right proportions and shape of a thin paperclip - NOT bulky, NOT a refrigerator, NOT a thick shape. NO text. NO human features except the eyes. NO extra limbs. Style: clean, professional digital art with good lighting.`;
 
     console.log('[BlazeJob][Image] Génération de l’image trombone...');
 console.log(`[BlazeJob][Image] Prompt utilisé : ${imagePrompt}`);
@@ -116,7 +116,7 @@ export async function postClippyImage() {
 
     // Utilise un prompt d'image standard et constant au lieu du texte généré
     // pour éviter les problèmes d'incohérence et les images bizarres
-    const imagePrompt = `High-quality digital illustration of the original Microsoft Office Assistant Clippy (the paperclip character) in a professional setting. IMPORTANT: Clippy must have EXACTLY two eyes, the classic bent paperclip shape, and correct proportions. NO human features except eyes. NO extra limbs. NO TEXT OR WORDS IN THE IMAGE. Style: clean, professional digital art with good lighting.`;
+    const imagePrompt = `Photorealistic digital illustration of the EXACT Microsoft Office Assistant Clippy in a modern blockchain/crypto setting with subtle blockchain elements in the background (like a bitcoin logo or crypto chart). Clippy is a THIN METAL PAPERCLIP character with EXACTLY two large oval eyes (black pupils with white surrounding), bent in the classic paperclip shape with the top part forming a rounded triangle like an eyebrow. The paperclip is SHINY SILVER/METALLIC and has a thin wire body. EXTREMELY IMPORTANT: Clippy must be IMMEDIATELY RECOGNIZABLE as the original Office Assistant, with the exact right proportions and shape of a thin paperclip - NOT bulky, NOT a refrigerator, NOT a thick shape. NO text. NO human features except the eyes. NO extra limbs. Style: clean, professional digital art with good lighting.`;
     
     console.log('[Image] Génération de l’image Clippy...');
     console.log(`[Image] Prompt utilisé : ${imagePrompt}`);
