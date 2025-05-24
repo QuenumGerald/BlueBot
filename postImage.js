@@ -42,10 +42,23 @@ const imagePrompt = `Cartoon drawing of a paperclip character (like Clippy from 
 
     console.log('[BlazeJob][Image] Génération de l’image trombone...');
 console.log(`[BlazeJob][Image] Prompt utilisé : ${imagePrompt}`);
-    const imageBuffer = await generateClippyImage(imagePrompt);
-    console.log('[Image] Image générée.');
+    let imageBuffer = await generateClippyImage(imagePrompt);
+    console.log(`[Image] Image générée. Taille: ${(imageBuffer.length / 1024).toFixed(2)}KB`);
 
-    console.log('[Bluesky] Upload de l’image sur Bluesky...');
+    // Vérification de la taille du fichier (max 950KB pour être sûr)
+    if (imageBuffer.length > 950 * 1024) {
+      console.log('[Image] Taille de l\'image trop grande, redimensionnement...');
+      // Utilisation de sharp pour redimensionner
+      const sharp = await import('sharp');
+      imageBuffer = await sharp.default(imageBuffer)
+        .resize({ width: 1000, withoutEnlargement: true })
+        .jpeg({ quality: 80, mozjpeg: true })
+        .toBuffer();
+      
+      console.log(`[Image] Taille après redimensionnement: ${(imageBuffer.length / 1024).toFixed(2)}KB`);
+    }
+
+    console.log('[Bluesky] Upload de l\'image sur Bluesky...');
     const blob = await uploadImageToBluesky(imageBuffer);
     console.log('[Bluesky] Publication du post...');
     await agent.post({
