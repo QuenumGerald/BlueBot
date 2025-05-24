@@ -152,8 +152,25 @@ export async function autoReply() {
         continue;
       }
       try {
-        console.log(`[Réponse] Génération d’une réponse à : ${text}`);
-        const reply = await generateReplyText(text);
+        // Tronque intelligemment les textes trop longs pour l'API
+        const MAX_INPUT_LENGTH = 500; // Longueur maximale raisonnable pour l'entrée
+        let truncatedText = text;
+        
+        if (text && text.length > MAX_INPUT_LENGTH) {
+          // Coupe à la dernière phrase complète avant la limite
+          const lastSentenceBreak = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf('.');
+          if (lastSentenceBreak > MAX_INPUT_LENGTH * 0.5) { // Si on a au moins la moitié du texte
+            truncatedText = text.substring(0, lastSentenceBreak + 1) + ' [...]';
+          } else {
+            // Sinon coupe au dernier espace pour ne pas couper un mot
+            const lastSpace = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf(' ');
+            truncatedText = text.substring(0, lastSpace) + ' [...]';
+          }
+          console.log(`[Troncature] Texte original ${text.length} caractères -> ${truncatedText.length} caractères`);
+        }
+        
+        console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
+        const reply = await generateReplyText(truncatedText);
         console.log(`[Réponse] Réponse générée : ${reply}`);
         await agent.post({
           reply: {
