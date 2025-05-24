@@ -39,13 +39,13 @@ function saveReplyHistory(history) {
     // Nettoie l'historique en supprimant les entrées trop anciennes
     const now = Date.now();
     const maxAge = MAX_HISTORY_DAYS * 24 * 60 * 60 * 1000; // Convertit jours en ms
-    
+
     Object.keys(history).forEach(did => {
       if (now - history[did] > maxAge) {
         delete history[did];
       }
     });
-    
+
     fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2), 'utf8');
   } catch (error) {
     console.error('[Historique] Erreur lors de la sauvegarde de l\'historique:', error.message);
@@ -70,26 +70,60 @@ export async function autoReply() {
   try {
     // Charge l'historique des réponses
     const replyHistory = loadReplyHistory();
-    
+
     // Limite différente selon le mode (test ou production)
     const isTest = process.env.NODE_ENV === 'test';
     const MAX_REPLIES = isTest ? 3 : 10; // Seulement 3 réponses en mode test
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
-    // Liste de hashtags populaires à cibler
-    const hashtags = ['crypto', 'tech', 'blockchain', 'web3', 'windows', 'clippy'];
+    // Termes de recherche pour trouver des posts intéressants (sans hashtags)
+    const searchTerms = [
+      // Termes généraux de base
+      'bitcoin', 'ethereum', 'blockchain', 'tech', 'clippy',
+
+      // Termes Bitcoin spécifiques et techniques
+      'satoshi nakamoto', 'hal finney', 'lightning network',
+      'segwit', 'bitcoin halving', 'UTXO', 'proof of work',
+      'bitcoin mining difficulty', 'bitcoin mempool', 'taproot upgrade',
+
+      // Termes Ethereum spécifiques et techniques
+      'gavin wood', 'polkadot founder',
+      'ethereum merge', 'solidity', 'ERC-20', 'EIP-1559', 'optimistic rollups',
+      'layer 2 scaling', 'serenity upgrade', 'casper protocol',
+
+      // Termes blockchain spécifiques et techniques
+      'zero knowledge proofs', 'merkle tree', 'consensus algorithm',
+      'delegated proof of stake', 'sharding implementation',
+      'blockchain interoperability', 'atomic swap', 'chainlink oracle',
+      'decentralized identity', 'evm compatibility',
+
+      // Termes tech spécifiques et profonds
+      'arm64 architecture', 'RISC processor', 'quantum computing',
+      'neural network optimization', 'IPv6 transition', 'WebAssembly',
+      'microservice architecture', 'TensorFlow implementation',
+      'CUDA parallel computing', 'serverless deployment',
+
+      // Termes Clippy et technologie rétro spécifiques
+      'leanne ruzsa-atkinson',
+      'kevan atkinson clippy', 'BonziBuddy purple gorilla', 'microsoft bob interface',
+      'windows 95 release', 'windows NT kernel', 'internet explorer 6 quirks', 'MS-DOS commands'
+    ];
+
     const allPosts = [];
     if (!agent.session || !agent.session.did) {
       console.error('[ERREUR] L’agent Bluesky n’est pas authentifié. Vérifiez vos identifiants et la connexion.');
       return;
     }
-    for (const hashtag of hashtags) {
-      console.log(`[Recherche] Récupération des 10 derniers posts #${hashtag}`);
-      // Nouvelle méthode : searchPosts
-      const res = await agent.app.bsky.feed.searchPosts({ q: `#${hashtag}`, limit: 10 });
+
+    for (const term of searchTerms) {
+      console.log(`[Recherche] Récupération des 10 derniers posts contenant "${term}"`);
+      // Recherche par terme (hashtag ou mots-clés)
+      const res = await agent.app.bsky.feed.searchPosts({ q: term, limit: 10 });
       if (res && Array.isArray(res.data.posts)) {
         allPosts.push(...res.data.posts);
       }
+      // Petit délai entre les requêtes pour éviter le rate limiting
+      await delay(500);
     }
     // Supprime les doublons de posts (par uri)
     const uniquePosts = Array.from(new Map(allPosts.map(p => [p.uri, p])).values());
@@ -104,13 +138,13 @@ export async function autoReply() {
     for (const post of uniquePosts) {
       const { uri, author, record } = post;
       const text = record?.text;
-      
+
       // Vérifie si on a déjà répondu à cet utilisateur récemment
       if (hasRepliedRecently(author.did, replyHistory)) {
         console.log(`[IGNORÉ] Post ignoré (déjà répondu à ${author.handle}): uri=${uri}`);
         continue;
       }
-      
+
       // Ne répondre qu'aux posts en anglais
       const langs = record?.langs;
       if (!langs || !langs.includes('en')) {
@@ -130,7 +164,7 @@ export async function autoReply() {
         });
         repliedCount++;
         console.log(`[Succès] Répondu à ${uri}`);
-        
+
         // Ajoute l'utilisateur à l'historique
         replyHistory[author.did] = Date.now();
         saveReplyHistory(replyHistory);
