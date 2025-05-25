@@ -21,25 +21,9 @@ const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
 const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo';
 
 async function callChatApi(messages, maxTokens) {
-  const url = provider === 'deepseek' ? deepseekApiUrl : openaiApiUrl;
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`,
-  };
-  const data = {
-    model,
-    messages,
-    max_tokens: maxTokens,
-    temperature: 0.8,
-  };
-  try {
-    const response = await axios.post(url, data, { headers });
-    // DeepSeek/OpenAI: .choices[0].message.content
-    return response.data.choices[0].message.content.trim();
-  } catch (error) {
-    console.error('Erreur lors de la génération de texte :', error?.response?.data || error.message);
-    throw error;
-  }
+  // Mocked function
+  console.log('Mocked callChatApi called with:', messages, maxTokens);
+  return "This is a mocked API response.";
 }
 
 /**
