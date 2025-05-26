@@ -2,6 +2,35 @@
 // Like et follow automatiquement des cibles via l'agent Bluesky
 
 import { agent } from './bluesky.js';
+import fs from 'fs';
+
+const LIKE_HISTORY_FILE = './like-history.json';
+const MAX_LIKE_HISTORY_DAYS = 10;
+
+function loadLikeHistory() {
+  try {
+    if (fs.existsSync(LIKE_HISTORY_FILE)) {
+      const data = fs.readFileSync(LIKE_HISTORY_FILE, 'utf8');
+      const history = JSON.parse(data);
+      // Nettoyage: supprime les entrées trop vieilles
+      const now = Date.now();
+      const maxAge = MAX_LIKE_HISTORY_DAYS * 24 * 60 * 60 * 1000;
+      for (const did of Object.keys(history)) {
+        if (now - history[did] > maxAge) {
+          delete history[did];
+        }
+      }
+      return history;
+    }
+  } catch (e) { console.error('[LikeHistory] Erreur chargement:', e); }
+  return {};
+}
+
+function saveLikeHistory(history) {
+  try { fs.writeFileSync(LIKE_HISTORY_FILE, JSON.stringify(history, null, 2)); }
+  catch (e) { console.error('[LikeHistory] Erreur sauvegarde:', e); }
+}
+
 
 // Fonction utilitaire pour temporiser
 export function delay(ms) {
@@ -16,7 +45,11 @@ export function delay(ms) {
  * @param {string} hashtag - Hashtag sans # (ex: 'clippy')
  * @param {number} max - Nombre de posts à traiter (par défaut 5)
  */
-export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5, delayMs = 2000) {
+// Limites recommandées Bluesky :
+// - Pas plus de 30 likes/heure (max 200/jour)
+// - delayMs >= 3000 ms (3 secondes)
+// - max <= 10-15 par run si scheduler toutes les 20-30 min
+export async function likeAndFollowHashtag(hashtag = 'clippy', max = 10, delayMs = 3000) {
   try {
     // Recherche les derniers posts contenant le hashtag
     console.log(`[BlazeJob][INFO] Recherche des posts pour le hashtag #${hashtag} (max ${max})`);
@@ -24,10 +57,18 @@ export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5, delayMs 
     const posts = res.data.posts || [];
     console.log(`[BlazeJob][INFO] ${posts.length} posts trouvés pour #${hashtag}`);
     let count = 0;
+    // Chargement de l'historique des likes
+    const likeHistory = loadLikeHistory();
     for (const post of posts) {
       count++;
-      console.log(`[BlazeJob][INFO] Traitement du post ${count}/${posts.length} (uri: ${post.uri})`);
       const { uri, cid, author } = post;
+      if (!author?.did) continue;
+      // Ne jamais liker deux fois le même compte (sur la période)
+      if (likeHistory[author.did]) {
+        console.log(`[BlazeJob][Like] Ignoré : déjà liké ce compte (${author.did}) récemment.`);
+        continue;
+      }
+      console.log(`[BlazeJob][INFO] Traitement du post ${count}/${posts.length} (uri: ${post.uri})`);
       // Like le post (besoin de uri + cid)
       try {
         console.log(`[BlazeJob][INFO] Tentative de like pour le post (uri: ${uri})`);
@@ -43,6 +84,9 @@ export async function likeAndFollowHashtag(hashtag = 'clippy', max = 5, delayMs 
           collection: 'app.bsky.feed.like',
           record,
         });
+        // Ajoute le compte à l'historique des likes
+        likeHistory[author.did] = Date.now();
+        saveLikeHistory(likeHistory);
         console.log(`[BlazeJob][Like] Succès : ${uri}`);
       } catch (err) {
         console.error(`[BlazeJob][Like] Échec : ${uri} ->`, err?.response?.data || err.message);

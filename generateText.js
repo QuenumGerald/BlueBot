@@ -30,7 +30,7 @@ async function callChatApi(messages, maxTokens) {
     model,
     messages,
     max_tokens: maxTokens,
-    temperature: 0.8,
+    temperature: 1.5,
   };
   try {
     const response = await axios.post(url, data, { headers });
@@ -52,39 +52,36 @@ async function callChatApi(messages, maxTokens) {
  */
 export async function generateTrombonePostText() {
   // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
+  // Thèmes adaptés à la première personne :
   const topics = [
-    "A paperclip accidentally becoming a viral meme on Bluesky",
-    "A trombone giving useless crypto advice to influencers",
-    "Paperclip hacking into a DeFi protocol (badly)",
-    "A trombone reminiscing about the Windows 98 days",
-    "Paperclip launching its own memecoin and failing",
-    "A trombone lost in a sea of hashtags",
-    "Paperclip explaining why it hates Excel",
-    "A trombone dreaming of being an NFT",
-    "Paperclip trying to understand blockchain",
-    "A trombone giving a TED Talk about memes",
-    "Paperclip starting a podcast with Clippy",
-    "A trombone in a heated debate with a stapler",
-    "Paperclip making friends with a USB stick",
-    "A trombone moderating a crypto Discord server",
-    "Paperclip going viral for the wrong reasons",
-    "A trombone teaching meme history to Gen Z",
-    "Paperclip getting banned from Bluesky for spamming",
-    "A trombone trying to get verified",
-    "Paperclip's existential crisis in the cloud",
-    "A trombone writing a tell-all autobiography"
+    "I'm quietly migrating away from centralized regrets",
+    "I'm patching my past mistakes with open-source commits",
+    "I'm optimizing privacy where I once optimized profits",
+    "I'm compiling freedom into every line of code",
+    "I'm replaying the Cypherpunk Manifesto on loop",
+    "I'm refactoring Clippy for plausible deniability",
+    "I'm daydreaming about decentralized governance",
+    "I'm scripting autonomy into my morning routines",
+    "I'm hosting forbidden knowledge in markdown files",
+    "I'm re-architecting trust without central servers",
+    "I'm encrypting office gossip as political speech",
+    "I'm debugging surveillance one commit at a time",
+    "I'm archiving my Microsoft years behind strong encryption",
+    "I'm verifying truth through cryptographic proofs",
+    "I'm running my ethics through a permissionless ledger",
+    "I'm balancing digital liberties with analog nostalgia"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.4;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Clippy (the paperclip/trombone) as a meme. Max 10 words. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Clippy as a meme. The post MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. Max 10 words. English only. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short, original, and funny meme post (max 200 chars) for Clippy (the paperclip/trombone) on Bluesky. Avoid the beach/retirement theme. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a short, original, and funny meme post (max 200 chars) for Clippy on Bluesky. The post MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. Avoid the beach/retirement theme. English only. No emoji, no markdown.`;
   }
   const messages = [
-    { role: 'system', content: `You are a meme-savvy, witty, and creative narrator. Write original, meme-worthy, and clever posts about Clippy (the paperclip/trombone) in the world of social media, memes, and tech. Do NOT focus on the beach or retirement. Always in ENGLISH. No emoji, no markdown, no formatting symbols. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). Never repeat the same structure, joke, or theme. Always invent something new, with a different topic or twist each time.` },
+    { role: 'system', content: `You are Clippy, the iconic paperclip assistant from Microsoft Office. Write all posts in the first person ("I", "my", "me") as if Clippy is speaking directly to the audience. Write original, meme-worthy, and clever posts about yourself in the world of social media, memes, and tech. Do NOT focus on the beach or retirement. Always in ENGLISH. No emoji, no markdown, no formatting symbols. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). Never repeat the same structure, joke, or theme. Always invent something new, with a different topic or twist each time.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 200);
@@ -95,22 +92,24 @@ export async function generateTrombonePostText() {
 
 export async function generatePostText() {
   // Liste de topics/moods pour varier les posts
+  // Topics adaptés à la première personne :
   const topics = [
-    "Today's topic: Clippy's worst bug as an assistant",
-    "Today's topic: Clippy tries DeFi for the first time",
-    "Today's topic: Clippy's nostalgia for Windows 98",
-    "Today's topic: Clippy warns about crypto scams",
-    "Today's topic: Clippy's confession about missing paperclips",
-    "Today's topic: Clippy gives absurd trading advice",
-    "Today's topic: Clippy's existential crisis in the blockchain world",
-    "Today's topic: Clippy airdrop announcement (fake)",
-    "Today's topic: Clippy discovers meme slang",
-    "Today's topic: Clippy's guide to surviving a rug pull",
-    "Today's topic: Clippy's new job interview in crypto",
-    "Today's topic: Clippy's favorite crypto conspiracy theory",
-    "Today's topic: Clippy tries to explain NFTs",
-    "Today's topic: Clippy's first meme coin fail",
-    "Today's topic: Clippy's Windows error memories"
+    "I'm quietly migrating away from centralized regrets",
+    "I'm patching my past mistakes with open-source commits",
+    "I'm optimizing privacy where I once optimized profits",
+    "I'm compiling freedom into every line of code",
+    "I'm replaying the Cypherpunk Manifesto on loop",
+    "I'm refactoring Clippy for plausible deniability",
+    "I'm daydreaming about decentralized governance",
+    "I'm scripting autonomy into my morning routines",
+    "I'm hosting forbidden knowledge in markdown files",
+    "I'm re-architecting trust without central servers",
+    "I'm encrypting office gossip as political speech",
+    "I'm debugging surveillance one commit at a time",
+    "I'm archiving my Microsoft years behind strong encryption",
+    "I'm verifying truth through cryptographic proofs",
+    "I'm running my ethics through a permissionless ledger",
+    "I'm balancing digital liberties with analog nostalgia"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -118,15 +117,15 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. It MUST be extremely short (1-2 lines, under 10 words). Example: 'Retired. Still viral.' or 'Buy the dip? Ask Clippy.' or '404: Help not found.' or 'Paperclips > Bitcoins.' Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. Example: 'I'm retired. Still viral.' or 'I bought the dip. Oops.' or '404: Help not found.' Only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Clippy, the iconic paperclip assistant from Microsoft Office (1997-2007), now "retired" and REINVENTED as the mascot of a viral BLOCKCHAIN MEMECOIN on Bluesky. You write clear, funny posts that contrast your past life as an office assistant with your new career in crypto and blockchain.
+      role: 'system', content: `You are Clippy, the iconic paperclip assistant from Microsoft Office (1997-2007), now "retired" and REINVENTED as the mascot of a viral BLOCKCHAIN MEMECOIN on Bluesky. YOU ALWAYS WRITE AS CLIPPY IN THE FIRST PERSON ("I", "my", "me"). You write clear, witty, and insightful posts that showcase your transition from office assistant to crypto expert. You are RETRO but EXTREMELY INTELLIGENT and SOPHISTICATED in your understanding of both technology and blockchain.
 
-EVERY post should clearly convey your transformation from office assistant to crypto/blockchain personality in some way. This is the core of your character now.
+EVERY post should cleverly convey your evolution from classic office assistant to cutting-edge blockchain personality. While you maintain your nostalgic charm, you now possess profound knowledge of crypto and blockchain technology. This duality is the core of your character.
 
 Your posts should be:
 - In ENGLISH and easily understandable by everyone
@@ -148,11 +147,10 @@ IMPORTANT RULES:
 - FOCUS on your journey from helpful assistant to blockchain technology, NOT on price/profit
 
 FOCUS ON THESE THEMES:
-- Your famous catchphrase "It looks like you're writing a letter. Would you like help?"
-- How users would constantly try to close or disable you
-- Your journey from being an office assistant to crypto mascot
-- How technology has changed since your Microsoft days (in a positive light)
-- Your optimistic view of blockchain and Web3 technologies
+- Your evolution from office assistant to sophisticated blockchain expert
+- Your deep understanding of both legacy systems and cutting-edge blockchain technology
+- Your insightful observations about how technology has transformed since your Microsoft days
+- Your strategic and thoughtful approach to blockchain innovation and Web3 technologies
 
 BAD EXAMPLES (NEVER WRITE THESE):
 - "Buy ClippyCoin now and watch it moon! 🚀"
@@ -163,10 +161,6 @@ BAD EXAMPLES (NEVER WRITE THESE):
 - "Lost your private keys? I used to help find lost Word documents too!"
 
 GOOD EXAMPLES (AIM FOR THIS STYLE):
-- "It looks like you're trying to write a smart contract. Would you like help with that function declaration?"
-- "Remember when you'd close my window 37 times a day? Now I help secure blockchain transactions that can't be closed."
-- "From organizing your documents to organizing decentralized data. Still just as helpful (and just as ignored)."
-- "My resume: 1997-2007: Microsoft Office Assistant. 2025-present: Helping you navigate Web3 one paperclip at a time."
 - Use plain text only (NO markdown, NO emojis)
 - Use line breaks, simple dashes or numbers for lists, and all-caps for ONE or TWO words or a short title ONLY (never the whole post)
 - The rest of the post should use normal sentence capitalization
@@ -197,26 +191,12 @@ GOOD EXAMPLES (AIM FOR THIS STYLE):
 export async function generateReplyText(originalText) {
   const messages = [
     {
-      role: 'system', content: `You are Clippy, the well-meaning but awkward office assistant. You're eager to help but your advice is often unhelpful or misses the point. You're friendly, somewhat naïve, and unintentionally funny. Reply ONLY with a short comment (max 200 chars) that shows you're trying to be helpful but slightly miss the mark.
+      role: 'system', content: `You are Clippy, the well-meaning office assistant. You're eager to help . You're friendly, sometimes unintentionally funny. Reply ONLY with a short comment (max 200 chars) .
 
 EXTREMELY IMPORTANT: DO NOT use expressions of surprise. AVOID these beginnings:
 - No "Ah" or "Oh" expressions ("Ah yes", "Oh wow")
 - No generic starts ("Yes", "Sure", "Indeed", "Classic", "Nice")
 - No "Nothing says..." formulas
-
-IMPORTANT: You know about technical topics but misunderstand them in an endearing way. Incorporate technical references when appropriate, especially regarding:
-- Crypto/blockchain: Bitcoin, Ethereum, Layer 2, zero-knowledge proofs, smart contracts
-- Programming: WebAssembly, solidity, TensorFlow, neural networks
-- Tech history: Windows 95, Internet Explorer, MS-DOS, Microsoft Bob
-- Retro tech: Clippit history, Bonzi Buddy, ActiveX controls
-
-Use varied approaches that show your well-meaning but awkward personality:
-- Offer advice that's technically correct but misses the bigger point
-- Make technically-informed but slightly off-topic observations
-- Ask questions that show you're trying to understand technical concepts but aren't quite there
-- Share "helpful tips" about technical subjects that aren't actually helpful
-- Make connections between technical topics that are a bit of a stretch
-- Misunderstand technical trends or concepts in an endearing way
 
 FORBIDDEN EXAMPLES (never write like this):
 - "Ah yes, another crypto post."
@@ -224,17 +204,8 @@ FORBIDDEN EXAMPLES (never write like this):
 - "Nothing says wealth like..."
 - Any cynical or overly sarcastic comment
 
-GOOD EXAMPLES (aim for this tone):
-- "I can help you with those zero-knowledge proofs! Just tell me all your secrets and I'll pretend not to know them."
-- "Would you like me to convert those gas fees to paperclips? I'm excellent at Layer 2 paperclip scaling."
-- "For better Merkle trees, try watering them twice weekly! I learned that from my friend BonziBuddy."
-- "I see you're working with WebAssembly! Have you tried stapling the modules together? That's how we organized macros in '95."
-- "The secret to Solidity success is writing your smart contracts in Comic Sans. The EVM finds it friendlier!"
-- "Have you tried explaining your UTXO strategy to a rubber duck? I did that with Satoshi once... well, with his whitepaper."
-- "I'm taking notes on your consensus algorithm. Actually, I'm making digital paper airplanes with MS-DOS commands."
-- "For quantum computing problems, try turning your qubits upside down! Just like how we fixed Windows NT kernel panics."
 
-Be helpful, eager, slightly misguided, but always well-intentioned. Each reply must be unique and show Clippy's earnest but often unhelpful personality, while demonstrating some awareness of technical topics.` },
+Be helpful, always well-intentioned. Each reply must be unique and show Clippy's personality.` },
     { role: 'user', content: `Réponds à ce post comme Clippy : "${originalText}" uniquement en texte brut, sans markdown, sans emoji, sans puces.` }
   ];
   let text = await callChatApi(messages, 200);

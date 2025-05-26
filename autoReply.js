@@ -12,37 +12,72 @@ function delay(ms) {
 
 // Gestion de l'historique des utilisateurs déjà contactés
 const HISTORY_FILE = './reply-history.json';
-const MAX_HISTORY_DAYS = 14; // Durée en jours pendant laquelle on ne recontacte pas quelqu'un
+const MAX_HISTORY_DAYS = 14; // Durée en jours pendant laquelle on ne recontacte pas quelqu'un 
 
 /**
- * Charge l'historique des DID auxquels le bot a déjà répondu
- * @returns {Object} Un objet avec les DIDs comme clés et les timestamps comme valeurs
+ * Charge l'historique des réponses (utilisateurs et posts)
+ * @returns {Object} Un objet avec les propriétés users et posts
  */
 function loadReplyHistory() {
   try {
     if (fs.existsSync(HISTORY_FILE)) {
       const data = fs.readFileSync(HISTORY_FILE, 'utf8');
-      return JSON.parse(data);
+      const history = JSON.parse(data);
+
+      // Assure la compatibilité avec l'ancien format
+      if (!history.users || !history.posts) {
+        // Convertit l'ancien format au nouveau format
+        const oldUsers = {};
+        Object.keys(history).forEach(key => {
+          if (key !== 'users' && key !== 'posts') {
+            oldUsers[key] = history[key];
+          }
+        });
+
+        return {
+          users: oldUsers,
+          posts: {}
+        };
+      }
+
+      return history;
     }
   } catch (error) {
     console.error('[Historique] Erreur lors du chargement de l\'historique:', error.message);
   }
-  return {}; // Retourne un objet vide si le fichier n'existe pas ou est invalide
+
+  // Retourne une structure vide avec users et posts
+  return {
+    users: {},
+    posts: {}
+  };
 }
 
 /**
- * Sauvegarde l'historique des DID auxquels le bot a déjà répondu
- * @param {Object} history Un objet avec les DIDs comme clés et les timestamps comme valeurs
+ * Sauvegarde l'historique des réponses (utilisateurs et posts)
+ * @param {Object} history Un objet avec les propriétés users et posts
  */
 function saveReplyHistory(history) {
   try {
+    // Assure que la structure est correcte
+    if (!history.users) history.users = {};
+    if (!history.posts) history.posts = {};
+
     // Nettoie l'historique en supprimant les entrées trop anciennes
     const now = Date.now();
     const maxAge = MAX_HISTORY_DAYS * 24 * 60 * 60 * 1000; // Convertit jours en ms
 
-    Object.keys(history).forEach(did => {
-      if (now - history[did] > maxAge) {
-        delete history[did];
+    // Nettoie les utilisateurs
+    Object.keys(history.users).forEach(did => {
+      if (now - history.users[did] > maxAge) {
+        delete history.users[did];
+      }
+    });
+
+    // Nettoie les posts
+    Object.keys(history.posts).forEach(uri => {
+      if (now - history.posts[uri] > maxAge) {
+        delete history.posts[uri];
       }
     });
 
@@ -53,13 +88,24 @@ function saveReplyHistory(history) {
 }
 
 /**
- * Vérifie si on a déjà répondu à un utilisateur récemment
+ * Vérifie si on a déjà répondu à un utilisateur ou à un post spécifique
  * @param {string} did DID de l'utilisateur à vérifier
+ * @param {string} uri URI du post à vérifier
  * @param {Object} history Historique des réponses
- * @returns {boolean} true si on a déjà répondu récemment
+ * @returns {boolean} true si on a déjà répondu récemment à cet utilisateur ou à ce post
  */
-function hasRepliedRecently(did, history) {
-  return history.hasOwnProperty(did);
+function hasRepliedRecently(did, uri, history) {
+  // Vérifie si on a déjà répondu à cet utilisateur récemment
+  if (history.users && history.users[did]) {
+    return true;
+  }
+
+  // Vérifie si on a déjà répondu à ce post spécifique
+  if (history.posts && history.posts[uri]) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -73,7 +119,10 @@ export async function autoReply() {
 
     // Limite différente selon le mode (test ou production)
     const isTest = process.env.NODE_ENV === 'test';
-    const MAX_REPLIES = isTest ? 3 : 10; // Seulement 3 réponses en mode test
+    // Limite recommandée Bluesky :
+    // - Pas plus de 100-200 replies/jour
+    // - MAX_REPLIES_PER_RUN = 10 si scheduler toutes les 20-30 min
+    const MAX_REPLIES_PER_RUN = 10; // Limite adaptée pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
@@ -127,6 +176,8 @@ export async function autoReply() {
     }
     // Supprime les doublons de posts (par uri)
     const uniquePosts = Array.from(new Map(allPosts.map(p => [p.uri, p])).values());
+    // Mélange aléatoire pour répondre à des posts variés à chaque run
+    uniquePosts.sort(() => Math.random() - 0.5);
     if (uniquePosts.length === 0) {
       console.warn('[INFO] Aucun post trouvé pour les hashtags ciblés.');
       return;
@@ -139,23 +190,19 @@ export async function autoReply() {
       const { uri, author, record } = post;
       const text = record?.text;
 
-      // Vérifie si on a déjà répondu à cet utilisateur récemment
-      if (hasRepliedRecently(author.did, replyHistory)) {
-        console.log(`[IGNORÉ] Post ignoré (déjà répondu à ${author.handle}): uri=${uri}`);
+      // Vérifie si on a déjà répondu à cet utilisateur ou à ce post récemment
+      if (hasRepliedRecently(author.did, uri, replyHistory)) {
+        const reason = replyHistory.users[author.did] ? `déjà répondu à ${author.handle}` : 'post déjà traité';
+        console.log(`[IGNORÉ] Post ignoré (${reason}): uri=${uri}`);
         continue;
       }
 
-      // Ne répondre qu'aux posts en anglais
-      const langs = record?.langs;
-      if (!langs || !langs.includes('en')) {
-        console.log(`[IGNORÉ] Post ignoré (langue non-anglaise): langs=${JSON.stringify(langs)}, uri=${uri}`);
-        continue;
-      }
+      // Note: La vérification de langue a été supprimée - le bot répond à toutes les langues
       try {
         // Tronque intelligemment les textes trop longs pour l'API
         const MAX_INPUT_LENGTH = 500; // Longueur maximale raisonnable pour l'entrée
         let truncatedText = text;
-        
+
         if (text && text.length > MAX_INPUT_LENGTH) {
           // Coupe à la dernière phrase complète avant la limite
           const lastSentenceBreak = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf('.');
@@ -168,7 +215,7 @@ export async function autoReply() {
           }
           console.log(`[Troncature] Texte original ${text.length} caractères -> ${truncatedText.length} caractères`);
         }
-        
+
         console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
         const reply = await generateReplyText(truncatedText);
         console.log(`[Réponse] Réponse générée : ${reply}`);
@@ -182,15 +229,19 @@ export async function autoReply() {
         repliedCount++;
         console.log(`[Succès] Répondu à ${uri}`);
 
-        // Ajoute l'utilisateur à l'historique
-        replyHistory[author.did] = Date.now();
+        // Ajoute l'utilisateur et le post à l'historique
+        if (!replyHistory.users) replyHistory.users = {};
+        if (!replyHistory.posts) replyHistory.posts = {};
+
+        replyHistory.users[author.did] = Date.now();
+        replyHistory.posts[uri] = Date.now();
         saveReplyHistory(replyHistory);
       } catch (error) {
         console.error(`[Erreur] Échec lors de la réponse à ${uri} :`, error?.response?.data || error.message);
       }
       await delay(10000);
-      if (repliedCount >= MAX_REPLIES) {
-        console.log(`[INFO] Limite de ${MAX_REPLIES} réponses atteinte, arrêt de la boucle.`);
+      if (repliedCount >= MAX_REPLIES_PER_RUN) {
+        console.log(`[INFO] Limite de ${MAX_REPLIES_PER_RUN} réponses atteinte, arrêt de la boucle.`);
         break;
       }
     }
