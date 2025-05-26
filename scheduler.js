@@ -61,7 +61,7 @@ for (let i = 0; i < 9; i++) {
     }
   }, {
     name: `Trombone Text Post ${9 + i}h`,
-    runAt: isTest ? inMinutes(3) : nextHour(9 + i),
+    runAt: isTest ? inMinutes(1) : nextHour(9 + i),
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
