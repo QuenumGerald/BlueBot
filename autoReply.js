@@ -5,6 +5,7 @@ import { agent, initBluesky } from './bluesky.js';
 import { generateReplyText } from './generateText.js';
 import fs from 'fs';
 import path from 'path';
+import { franc } from 'franc-min';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -112,10 +113,11 @@ function hasRepliedRecently(did, uri, history) {
  * Recherche les 10 derniers posts #CLIPPY et y répond de façon IA
  */
 export async function autoReply() {
-  let timeline;
   try {
+    let timeline;
     // Charge l'historique des réponses
     const replyHistory = loadReplyHistory();
+
 
     // Limite différente selon le mode (test ou production)
     const isTest = process.env.NODE_ENV === 'test';
@@ -186,6 +188,7 @@ export async function autoReply() {
     const myHandle = agent.session?.handle;
     console.log(`[DEBUG] Nombre de posts uniques récupérés : ${uniquePosts.length}`);
     let repliedCount = 0;
+
     for (const post of uniquePosts) {
       const { uri, author, record } = post;
       const text = record?.text;
@@ -197,7 +200,15 @@ export async function autoReply() {
         continue;
       }
 
-      // Note: La vérification de langue a été supprimée - le bot répond à toutes les langues
+      // Filtre de langue : ne répondre qu'aux posts en français ou anglais
+      let lang = 'undefined';
+      if (text) {
+        lang = franc(text, { minLength: 10 });
+      }
+      if (lang !== 'fra' && lang !== 'eng' && lang !== 'und') {
+        console.log(`[IGNORÉ] Post ignoré (langue non supportée : ${lang}) : uri=${uri}`);
+        continue; // NE PAS incrémenter repliedCount
+      }
       try {
         // Tronque intelligemment les textes trop longs pour l'API
         const MAX_INPUT_LENGTH = 500; // Longueur maximale raisonnable pour l'entrée
@@ -211,13 +222,10 @@ export async function autoReply() {
           } else {
             // Sinon coupe au dernier espace pour ne pas couper un mot
             const lastSpace = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf(' ');
-            truncatedText = text.substring(0, lastSpace) + ' [...]';
           }
-          console.log(`[Troncature] Texte original ${text.length} caractères -> ${truncatedText.length} caractères`);
         }
-
         console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
-        const reply = await generateReplyText(truncatedText);
+        let reply = await generateReplyText(truncatedText, lang === 'fra' ? 'fr' : 'en');
         console.log(`[Réponse] Réponse générée : ${reply}`);
         await agent.post({
           reply: {
@@ -228,11 +236,9 @@ export async function autoReply() {
         });
         repliedCount++;
         console.log(`[Succès] Répondu à ${uri}`);
-
         // Ajoute l'utilisateur et le post à l'historique
         if (!replyHistory.users) replyHistory.users = {};
         if (!replyHistory.posts) replyHistory.posts = {};
-
         replyHistory.users[author.did] = Date.now();
         replyHistory.posts[uri] = Date.now();
         saveReplyHistory(replyHistory);
@@ -247,14 +253,8 @@ export async function autoReply() {
     }
     console.log(`[DEBUG] Nombre total de réponses postées : ${repliedCount}`);
     console.log(`[INFO] Le bot a répondu à ${repliedCount} message(s) sur ${uniquePosts.length} posts uniques récupérés.`);
-  }
-  catch (error) {
+  } catch (error) {
     console.error('[Erreur][autoReply] Erreur globale dans autoReply :', error?.response?.data || error.message);
   }
 }
 
-// Exécute autoReply() si ce fichier est lancé directement (compat ES module)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  console.log('[INFO] Script lancé directement, démarrage autoReply()');
-  autoReply();
-}

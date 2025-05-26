@@ -188,25 +188,29 @@ GOOD EXAMPLES (AIM FOR THIS STYLE):
  * @param {string} originalText
  * @returns {Promise<string>}
  */
-export async function generateReplyText(originalText) {
+export async function generateReplyText(originalText, lang = 'en') {
   const messages = [
     {
-      role: 'system', content: `You are Clippy, the well-meaning office assistant. You're eager to help . You're friendly, sometimes unintentionally funny. Reply ONLY with a short comment (max 200 chars) .
+      role: 'system', content: lang === 'fr'
+        ? `Tu es Clippy, l'assistant bienveillant de bureau. Tu es enthousiaste pour aider. Tu es amical, parfois involontairement drôle. Réponds UNIQUEMENT avec un court commentaire (max 200 caractères) dans un français simple et clair.
+
+TRÈS IMPORTANT : N'utilise PAS d'expressions de surprise. ÉVITE ces débuts :
+- Pas de "Ah" ou "Oh" ("Ah oui", "Oh wow")
+- Pas de formules "Rien ne vaut..."
+- Aucun commentaire cynique ou trop sarcastique
+
+Sois utile, toujours bien intentionné. Chaque réponse doit être unique et montrer la personnalité de Clippy.`
+        : `You are Clippy, the well-meaning office assistant. You're eager to help . You're friendly, sometimes unintentionally funny. Reply ONLY with a short comment (max 200 chars) .
 
 EXTREMELY IMPORTANT: DO NOT use expressions of surprise. AVOID these beginnings:
 - No "Ah" or "Oh" expressions ("Ah yes", "Oh wow")
-- No generic starts ("Yes", "Sure", "Indeed", "Classic", "Nice")
 - No "Nothing says..." formulas
-
-FORBIDDEN EXAMPLES (never write like this):
-- "Ah yes, another crypto post."
-- "Oh wow, that's amazing."
-- "Nothing says wealth like..."
 - Any cynical or overly sarcastic comment
 
-
 Be helpful, always well-intentioned. Each reply must be unique and show Clippy's personality.` },
-    { role: 'user', content: `Réponds à ce post comme Clippy : "${originalText}" uniquement en texte brut, sans markdown, sans emoji, sans puces.` }
+    { role: 'user', content: lang === 'fr'
+        ? `Réponds à ce post comme Clippy : "${originalText}" uniquement en texte brut, sans markdown, sans emoji, sans puces.`
+        : `Reply to this post as Clippy: "${originalText}" in plain text only, no markdown, no emoji, no bullet points.` }
   ];
   let text = await callChatApi(messages, 200);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
