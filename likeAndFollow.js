@@ -69,28 +69,28 @@ export async function likeAndFollowHashtag(hashtag = 'clippy', max = 10, delayMs
         continue;
       }
       console.log(`[BlazeJob][INFO] Traitement du post ${count}/${posts.length} (uri: ${post.uri})`);
-      // Like le post (besoin de uri + cid)
-      try {
-        console.log(`[BlazeJob][INFO] Tentative de like pour le post (uri: ${uri})`);
-        if (!uri || !cid || !author?.did) throw new Error('Post incomplet (uri/cid/did manquant)');
-        const record = {
-          $type: 'app.bsky.feed.like',
-          subject: { uri, cid },
-          createdAt: new Date().toISOString(),
-        };
-        console.log('[BlazeJob][DEBUG] record envoyé à like.create:', JSON.stringify(record));
-        await agent.api.com.atproto.repo.createRecord({
-          repo: agent.session.did,
-          collection: 'app.bsky.feed.like',
-          record,
-        });
-        // Ajoute le compte à l'historique des likes
-        likeHistory[author.did] = Date.now();
-        saveLikeHistory(likeHistory);
-        console.log(`[BlazeJob][Like] Succès : ${uri}`);
-      } catch (err) {
-        console.error(`[BlazeJob][Like] Échec : ${uri} ->`, err?.response?.data || err.message);
-      }
+      // [DÉSACTIVÉ] Bloc like désactivé suite à un avertissement Bluesky (mai 2025)
+      // try {
+      //   console.log(`[BlazeJob][INFO] Tentative de like pour le post (uri: ${uri})`);
+      //   if (!uri || !cid || !author?.did) throw new Error('Post incomplet (uri/cid/did manquant)');
+      //   const record = {
+      //     $type: 'app.bsky.feed.like',
+      //     subject: { uri, cid },
+      //     createdAt: new Date().toISOString(),
+      //   };
+      //   console.log('[BlazeJob][DEBUG] record envoyé à like.create:', JSON.stringify(record));
+      //   await agent.api.com.atproto.repo.createRecord({
+      //     repo: agent.session.did,
+      //     collection: 'app.bsky.feed.like',
+      //     record,
+      //   });
+      //   // Ajoute le compte à l'historique des likes
+      //   likeHistory[author.did] = Date.now();
+      //   saveLikeHistory(likeHistory);
+      // } catch (err) {
+      //   console.error(`[BlazeJob][Like] Échec : ${uri} ->`, err?.response?.data || err.message);
+      // }
+      // Les likes sont désactivés jusqu'à nouvel ordre.
       // Follow l’auteur (besoin de DID)
       try {
         console.log(`[BlazeJob][INFO] Tentative de follow pour l’auteur (handle: ${author.handle}, did: ${author.did})`);

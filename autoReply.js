@@ -124,7 +124,7 @@ export async function autoReply() {
     // Limite recommandée Bluesky :
     // - Pas plus de 100-200 replies/jour
     // - MAX_REPLIES_PER_RUN = 10 si scheduler toutes les 20-30 min
-    const MAX_REPLIES_PER_RUN = 10; // Limite adaptée pour éviter le spam
+    const MAX_REPLIES_PER_RUN = 5; // [RÉDUIT] Limite divisée par 2 suite à un avertissement Bluesky (mai 2025)
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)

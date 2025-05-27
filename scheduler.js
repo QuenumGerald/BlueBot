@@ -100,11 +100,11 @@ const buyerHashtags = [
   'windows 95 release', 'windows NT kernel', 'internet explorer 6 quirks', 'MS-DOS commands'
 ];
 
-// Répartition sur 10 créneaux (2h, 4h, ..., 20h), 5 posts/hashtag/job, délai 2s entre chaque action
-const replyHours = [2, 6, 10, 14, 18];
-const likeFollowHours = [4, 8, 12, 16, 20];
-const maxPerJob = 5;
-const delayMs = 2000;
+// [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
+const replyHours = [2, 4, 6, 10, 18]; // 3 créneaux au lieu de 5
+const likeFollowHours = [4, 12, 20]; // 3 créneaux au lieu de 5
+const maxPerJob = 2; // 2 posts/hashtag/job au lieu de 5
+const delayMs = 3000; // délai augmenté pour ralentir encore plus
 
 // Planification auto-reply 5 fois/jour (créneaux séparés)
 import { autoReply } from './autoReply.js';
