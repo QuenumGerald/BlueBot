@@ -47,64 +47,65 @@ jobs.schedule(async () => {
 });
 
 // 9 posts texte courts (sans image) chaque jour de 9h à 17h (total 10 posts/jour)
-for (let i = 0; i < 9; i++) {
+const postTextHours = [9, 13, 17]; // 3 posts texte par jour
+for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
-      console.log(`[BlazeJob] [START] Job texte Clippy ${9 + i}h`);
+      console.log(`[BlazeJob] [START] Job texte Clippy ${hour}h`);
       await initBluesky();
       const text = await generateTrombonePostText();
       await agent.post({ text });
-      console.log(`[BlazeJob][PostTexte] Texte posté à ${9 + i}h :`, text);
-      console.log(`[BlazeJob] [END] Job texte Clippy ${9 + i}h`);
+      console.log(`[BlazeJob][PostTexte] Texte posté à ${hour}h :`, text);
+      console.log(`[BlazeJob] [END] Job texte Clippy ${hour}h`);
     } catch (err) {
-      console.error(`[BlazeJob][ERROR] Job texte Clippy ${9 + i}h :`, err);
+      console.error(`[BlazeJob][ERROR] Job texte Clippy ${hour}h :`, err);
     }
   }, {
-    name: `Trombone Text Post ${9 + i}h`,
-    runAt: isTest ? inMinutes(1) : nextHour(9 + i),
+    name: `Trombone Text Post ${hour}h`,
+    runAt: isTest ? inMinutes(1) : nextHour(hour),
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
 }
 
+
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const buyerHashtags = [
   // Termes généraux de base
-  'bitcoin', 'ethereum', 'blockchain', 'tech', 'clippy',
+  'bitcoin', 'ethereum', 'blockchain', 'clippy',
 
   // Termes Bitcoin spécifiques et techniques
-  'satoshi nakamoto', 'hal finney', 'lightning network',
-  'segwit', 'bitcoin halving', 'UTXO', 'proof of work',
+  'hal finney', 'lightning network',
+  'segwit', 'UTXO', 'proof of work',
   'bitcoin mining difficulty', 'bitcoin mempool', 'taproot upgrade',
 
   // Termes Ethereum spécifiques et techniques
-  'gavin wood', 'polkadot founder',
+  'gavin wood',
   'ethereum merge', 'solidity', 'ERC-20', 'EIP-1559', 'optimistic rollups',
   'layer 2 scaling', 'serenity upgrade', 'casper protocol',
 
   // Termes blockchain spécifiques et techniques
   'zero knowledge proofs', 'merkle tree', 'consensus algorithm',
   'delegated proof of stake', 'sharding implementation',
-  'blockchain interoperability', 'atomic swap', 'chainlink oracle',
-  'decentralized identity', 'evm compatibility',
+  'blockchain interoperability', 'atomic swap',
 
   // Termes tech spécifiques et profonds
   'arm64 architecture', 'RISC processor', 'quantum computing',
-  'neural network optimization', 'IPv6 transition', 'WebAssembly',
-  'microservice architecture', 'TensorFlow implementation',
-  'CUDA parallel computing', 'serverless deployment',
+  'neural network optimization',
+  'microservice architecture',
+  'CUDA parallel computing',
 
   // Termes Clippy et technologie rétro spécifiques
   'leanne ruzsa-atkinson',
-  'kevan atkinson clippy', 'BonziBuddy purple gorilla', 'microsoft bob interface',
-  'windows 95 release', 'windows NT kernel', 'internet explorer 6 quirks', 'MS-DOS commands'
+  'kevan atkinson clippy',
+  'windows 95 release', 'windows NT kernel', 'MS-DOS commands'
 ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
-const replyHours = [2, 4, 6, 10, 18]; // 3 créneaux au lieu de 5
-const likeFollowHours = [4, 12, 20]; // 3 créneaux au lieu de 5
-const maxPerJob = 2; // 2 posts/hashtag/job au lieu de 5
-const delayMs = 3000; // délai augmenté pour ralentir encore plus
+const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
+const likeFollowHours = [4, 12, 20]; // 3 créneaux, maxPerJob augmenté
+const maxPerJob = 3; // 3 posts/hashtag/job pour +50%
+const delayMs = 3000; // délai inchangé
 
 // Planification auto-reply 5 fois/jour (créneaux séparés)
 import { autoReply } from './autoReply.js';
@@ -120,7 +121,7 @@ for (const hour of replyHours) {
   }, {
     name: `AutoReply ${hour}h`,
     runAt: isTest ? inMinutes(2) : nextHour(hour),
-    interval: 24 * 60 * 60 * 1000,
+    interval: 12 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
 }
@@ -138,7 +139,7 @@ for (const hour of likeFollowHours) {
   }, {
     name: `Buyer Like & Follow ${hour}h`,
     runAt: isTest ? inMinutes(3) : nextHour(hour),
-    interval: 24 * 60 * 60 * 1000,
+    interval: 12 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
 }
