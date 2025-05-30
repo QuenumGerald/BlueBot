@@ -139,7 +139,7 @@ for (const hour of likeFollowHours) {
   }, {
     name: `Buyer Like & Follow ${hour}h`,
     runAt: isTest ? inMinutes(3) : nextHour(hour),
-    interval: 12 * 60 * 60 * 1000,
+    interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
   });
 }
