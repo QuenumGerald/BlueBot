@@ -128,36 +128,13 @@ export async function autoReply() {
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
-    const searchTerms = [
-      // Termes généraux de base
-      'bitcoin', 'ethereum', 'blockchain', 'tech', 'clippy',
+    const searchTerms = [// Cat lovers
+      'cat', 'cat meme', 'catmemes',
+      'catlife', 'catcommunity', 'meow',
 
-      // Termes Bitcoin spécifiques et techniques
-      'satoshi nakamoto', 'hal finney', 'lightning network',
-      'segwit', 'bitcoin halving', 'UTXO', 'proof of work',
-      'bitcoin mining difficulty', 'bitcoin mempool', 'taproot upgrade',
-
-      // Termes Ethereum spécifiques et techniques
-      'gavin wood', 'polkadot founder',
-      'ethereum merge', 'solidity', 'ERC-20', 'EIP-1559', 'optimistic rollups',
-      'layer 2 scaling', 'serenity upgrade', 'casper protocol',
-
-      // Termes blockchain spécifiques et techniques
-      'zero knowledge proofs', 'merkle tree', 'consensus algorithm',
-      'delegated proof of stake', 'sharding implementation',
-      'blockchain interoperability', 'atomic swap', 'chainlink oracle',
-      'decentralized identity', 'evm compatibility',
-
-      // Termes tech spécifiques et profonds
-      'arm64 architecture', 'RISC processor', 'quantum computing',
-      'neural network optimization', 'IPv6 transition', 'WebAssembly',
-      'microservice architecture', 'TensorFlow implementation',
-      'CUDA parallel computing', 'serverless deployment',
-
-      // Termes Clippy et technologie rétro spécifiques
-      'leanne ruzsa-atkinson',
-      'kevan atkinson clippy', 'BonziBuddy purple gorilla', 'microsoft bob interface',
-      'windows 95 release', 'windows NT kernel', 'internet explorer 6 quirks', 'MS-DOS commands'
+      // Accessible tech & blockchain
+      'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
+      'opensource', 'dev', 'developer', 'coding', 'machinelearning',
     ];
 
     const allPosts = [];
