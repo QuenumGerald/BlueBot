@@ -58,7 +58,7 @@ const buyerHashtags =
     // Lending & yield
     'aave', 'apr', 'yield farming',
     // DeFi primitives
-    'defi', 'liquidity', 'flash loan',
+    'finance', 'flash loan', 'blockchain',
     // EVM & builders
     'ethereum', 'evm', 'smart contract',
     // Ecosystem buzz
