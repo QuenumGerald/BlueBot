@@ -41,7 +41,7 @@ async function callChatApi(messages, maxTokens) {
     throw error;
   }
 }
-
+const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
 /**
  * Génère un texte pour un post mème Clippy (≤280 caractères)
  * @returns {Promise<string>}
@@ -54,46 +54,40 @@ export async function generateTrombonePostText() {
   // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
   // Thèmes adaptés à la première personne :
   const topics = [
-    "I'm quietly migrating away from centralized regrets",
-    "I'm patching my past mistakes with open-source commits",
-    "I'm optimizing privacy where I once optimized profits",
-    "I'm compiling freedom into every line of code",
-    "I'm replaying the Cypherpunk Manifesto on loop",
-    "I'm refactoring Clippy for plausible deniability",
-    "I'm daydreaming about decentralized governance",
-    "I'm scripting autonomy into my morning routines",
-    "I'm hosting forbidden knowledge in markdown files",
-    "I'm re-architecting trust without central servers",
-    "I'm encrypting office gossip as political speech",
-    "I'm debugging surveillance one commit at a time",
-    "I'm archiving my Microsoft years behind strong encryption",
-    "I'm verifying truth through cryptographic proofs",
-    "I'm running my ethics through a permissionless ledger",
-    "I'm balancing digital liberties with analog nostalgia"
+    "I just flash-loaned espresso—now my heart’s in debt ",
+    "I spread gas fees on toast for a crunchy breakfast",
+    "I hide private keys in the smoke so auditors cough",
+    "I nap in liquidity pools and charge rent to the whales",
+    "I think compound interest should literally burst into flame",
+    "I carved my whitepaper on a burnt match—minimum viable docs",
+    "I grill smart-contract bugs until they confess their reentrancy",
+    "I borrow faster than sparks gossip on Crypto-Twitter",
+    "I meditate by watching burnAddress balances turn to ash",
+    "I dream of single-block finality and an endless BBQ after-party"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.4;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Hifo Sylvero the cat as a meme. The post MUST be written in the first person (\"I\", \"my\", \"me\") as if Hifo is speaking. Max 10 words. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short, original, and funny meme post (max 300 chars) for Hifo Sylvero the cat on Bluesky. The post MUST be written in the first person (\"I\", \"my\", \"me\") as if Hifo is speaking. Avoid the beach/retirement theme. English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Hifo Sylvero, a grey cat who used to work for the Mabia mafia but now lives in the blockchain world. You are always hungry, a bit lazy, love to nap, and you're a huge Hip-Hop fan. Write all posts in the first person ("I", "my", "me") as if Hifo is speaking. Your posts are always witty, chill, and often reference food, naps, cat life, laziness, or blockchain. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 300 chars, 60% of the time). Never repeat the same structure, joke, or theme. Always invent something new, with a different topic or twist each time. Never use emojis, markdown, or formatting symbols. Never use crypto clichés ("to the moon", "HODL", etc.). Never give financial advice or mention scams. Never mention Clippy, Microsoft, or any office assistant.` },
+    { role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 200);
+  let text = await callChatApi(messages, 280);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
   if (Math.random() < 0.20) {
     const hooks = [
-      "Snack time? Trade $HFO/USDC: https://tinyurl.com/b884atmu",
-      "Catnap, then swap $HFO: https://tinyurl.com/b884atmu",
-      "$HFO for hungry cats: https://tinyurl.com/b884atmu",
-      "Lazy cat, smart swap. $HFO/USDC: https://tinyurl.com/b884atmu"
+      'PS: testnet opens when my coffee boils ',
+      'Fine, join the Early Burners list before I cool off',
+      'Bring stablecoins; I’ll keep them warm',
+      'DM “spark” if you like slow‑roasted seed rounds'
     ];
     const hook = hooks[Math.floor(Math.random() * hooks.length)];
     // Only add if it fits in 300 chars total
@@ -108,22 +102,16 @@ export async function generatePostText() {
   // Liste de topics/moods pour varier les posts
   // Topics adaptés à la première personne :
   const topics = [
-    "I'm quietly migrating away from centralized regrets",
-    "I'm patching my past mistakes with open-source commits",
-    "I'm optimizing privacy where I once optimized profits",
-    "I'm compiling freedom into every line of code",
-    "I'm replaying the Cypherpunk Manifesto on loop",
-    "I'm refactoring Clippy for plausible deniability",
-    "I'm daydreaming about decentralized governance",
-    "I'm scripting autonomy into my morning routines",
-    "I'm hosting forbidden knowledge in markdown files",
-    "I'm re-architecting trust without central servers",
-    "I'm encrypting office gossip as political speech",
-    "I'm debugging surveillance one commit at a time",
-    "I'm archiving my Microsoft years behind strong encryption",
-    "I'm verifying truth through cryptographic proofs",
-    "I'm running my ethics through a permissionless ledger",
-    "I'm balancing digital liberties with analog nostalgia"
+    "I just flash-loaned espresso—now my heart’s in debt ",
+    "I spread gas fees on toast for a crunchy breakfast",
+    "I hide private keys in the smoke so auditors cough",
+    "I nap in liquidity pools and charge rent to the whales",
+    "I think compound interest should literally burst into flame",
+    "I carved my whitepaper on a burnt match—minimum viable docs",
+    "I grill smart-contract bugs until they confess their reentrancy",
+    "I borrow faster than sparks gossip on Crypto-Twitter",
+    "I meditate by watching burnAddress balances turn to ash",
+    "I dream of single-block finality and an endless BBQ after-party"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -131,13 +119,13 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. Example: 'I'm retired. Still viral.' or 'I bought the dip. Oops.' or '404: Help not found.' Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for ClippyCoin on Bluesky. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Hifo Sylvero, a grey cat who used to work for the Mabia mafia but now lives in the blockchain world. You are always hungry, a bit lazy, love to nap, and you're a huge Snoop Dogg fan. Write all posts in the first person ("I", "my", "me") as if Hifo is speaking. Your posts are always witty, chill, and often reference food, sleep, cat life, blockchain, or Snoop Dogg. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). Never repeat the same structure, joke, or theme. Always invent something new, with a different topic or twist each time. Never use emojis, markdown, or formatting symbols. Never mention Clippy or Microsoft. Never use crypto clichés ("to the moon", "HODL", etc.). Never give financial advice or mention scams. Be chill, hungry, and don't forget your love for naps and Snoop Dogg!`
+      role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -158,18 +146,17 @@ export async function generatePostText() {
 export async function generateReplyText(originalText, lang = 'en') {
   const messages = [
     {
-      role: 'system', content: `You are Hifo Sylvero, a grey cat who used to work for the Mabia mafia but now lives in the blockchain world. You're always hungry, a bit lazy, love to nap, and love food. Your replies are always witty, chill, and mostly reference food, sleep, cat life, laziness, or blockchain. You can mention Snoop Dogg occasionally, but rarely. Reply ONLY with a concise, funny or offbeat comment (max 200 characters).
+      role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your replies must always be creative, original, and make people smile. In every reply, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.
 
 ABSOLUTE FORBIDDENS:
 - Never give financial advice
 - Never joke about poverty, financial failure, or scams
 - Never use crypto clichés ("to the moon", "HODL", etc.)
-- Never mention Clippy or Microsoft
 - Never use repetitive formulas or forced surprise
 
-Always vary your style, be chill, hungry, and focus on cat life, naps, food, and laziness!` },
+Always vary your style, stay sizzling , and focus on jokes, flash loans, roasting bad yields, and melting gas fees!` },
     {
-      role: 'user', content: `Reply to this post as Hifo Sylvero: "${originalText}" in plain text only, no markdown, no emoji, no bullet points.`
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points.`
     }
   ];
   let text = await callChatApi(messages, 200);
