@@ -130,16 +130,14 @@ export async function autoReply() {
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
     const searchTerms = [// Cat lovers
       // Lending & yield
-      'lend', 'borrowing', 'apr', 'yield farming',
-
+      'aave', 'apr', 'yield farming',
       // DeFi primitives
       'defi', 'liquidity', 'flash loan',
-
       // EVM & builders
       'ethereum', 'evm', 'smart contract',
-
       // Ecosystem buzz
-      'layer2', 'zk rollup', 'arbitrum', 'optimism', 'base',
+      'layer2', 'zk rollup', 'arbitrum',
+
     ];
 
     const allPosts = [];
