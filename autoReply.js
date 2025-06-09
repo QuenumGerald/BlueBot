@@ -129,12 +129,17 @@ export async function autoReply() {
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
     const searchTerms = [// Cat lovers
-      'cat', 'cat meme', 'catmemes',
-      'catlife', 'catcommunity', 'meow',
+      // Lending & yield
+      'lend', 'borrowing', 'apr', 'yield farming',
 
-      // Accessible tech & blockchain
-      'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
-      'opensource', 'dev', 'developer', 'coding', 'machinelearning',
+      // DeFi primitives
+      'defi', 'liquidity', 'flash loan',
+
+      // EVM & builders
+      'ethereum', 'evm', 'smart contract',
+
+      // Ecosystem buzz
+      'layer2', 'zk rollup', 'arbitrum', 'optimism', 'base',
     ];
 
     const allPosts = [];
