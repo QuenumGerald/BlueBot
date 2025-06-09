@@ -5,7 +5,7 @@ import pkg from 'blazerjob';
 const { BlazeJob } = pkg;
 import dotenv from 'dotenv';
 
-import { generateSparkyPostText } from './generateText.js';
+import { generateTrombonePostText } from './generateText.js';
 import { likeAndFollowHashtag } from './likeAndFollow.js';
 import { agent, initBluesky } from './bluesky.js';
 
@@ -36,7 +36,7 @@ for (const hour of postTextHours) {
     try {
       console.log(`[BlazeJob] [START] Job texte Clippy ${hour}h`);
       await initBluesky();
-      const text = await generateSparkyPostText();
+      const text = await generateTrombonePostText();
       await agent.post({ text });
       console.log(`[BlazeJob][PostTexte] Texte posté à ${hour}h :`, text);
       console.log(`[BlazeJob] [END] Job texte Clippy ${hour}h`);
