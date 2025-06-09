@@ -55,19 +55,15 @@ for (const hour of postTextHours) {
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const buyerHashtags = [
   // Lending & yield
-  'lend', 'borrowing', 'apr', 'apy', 'yield farming', 'passive income',
+  'lend', 'borrowing', 'apr', 'apy', 'yield farming',
 
-  // DeFi primitives
-  'defi', 'liquidity', 'flash loan', 'stablecoin', 'tvl',
+
 
   // EVM & builders
-  'ethereum', 'evm', 'smart contract', 'solidity', 'hardhat', 'foundry',
 
-  // Community / onboarding
-  'onchain', 'web3 builder', 'crypto dev', 'hackathon', 'open source',
 
   // Ecosystem buzz
-  'layer2', 'zk rollup', 'arbitrum', 'optimism', 'base',
+  'layer2', 'zk rollup', 'arbitrum',
 ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
