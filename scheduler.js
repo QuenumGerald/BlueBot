@@ -5,7 +5,7 @@ import pkg from 'blazerjob';
 const { BlazeJob } = pkg;
 import dotenv from 'dotenv';
 
-import { generateTrombonePostText } from './generateText.js';
+import { generateSparkyPostText } from './generateText.js';
 import { likeAndFollowHashtag } from './likeAndFollow.js';
 import { agent, initBluesky } from './bluesky.js';
 
@@ -36,7 +36,7 @@ for (const hour of postTextHours) {
     try {
       console.log(`[BlazeJob] [START] Job texte Clippy ${hour}h`);
       await initBluesky();
-      const text = await generateTrombonePostText();
+      const text = await generateSparkyPostText();
       await agent.post({ text });
       console.log(`[BlazeJob][PostTexte] Texte posté à ${hour}h :`, text);
       console.log(`[BlazeJob] [END] Job texte Clippy ${hour}h`);
@@ -54,19 +54,22 @@ for (const hour of postTextHours) {
 
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const buyerHashtags = [
-  // Cat lovers
-  'cat', 'cat meme', 'catmemes',
-  'catlife', 'catcommunity', 'meow',
+  // Lending & yield
+  'lend', 'borrowing', 'apr', 'apy', 'yield farming',
 
-  // Accessible tech & blockchain
-  'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
-  'opensource', 'dev', 'developer', 'coding', 'machinelearning',
+
+
+  // EVM & builders
+
+
+  // Ecosystem buzz
+  'layer2', 'zk rollup', 'arbitrum',
 ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
 const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
 const likeFollowHours = [4, 12, 20]; // 3 créneaux, maxPerJob augmenté
-const maxPerJob = 1; // 3 posts/hashtag/job pour +50%
+const maxPerJob = 2; // 3 posts/hashtag/job pour +50%
 const delayMs = 3000; // délai inchangé
 
 // Planification auto-reply 5 fois/jour (créneaux séparés)
