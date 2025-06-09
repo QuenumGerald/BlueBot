@@ -136,7 +136,7 @@ export async function generatePostText() {
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 280);
+  let text = await callChatApi(messages, 200);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Coupe à 280 caractères max
@@ -161,12 +161,12 @@ ABSOLUTE FORBIDDENS:
 
 Always vary your style, stay sizzling , and focus on jokes, flash loans, roasting bad yields, and melting gas fees!` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points.`
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be extremely concise, less than 120 characters, and fit in a single witty line.`
     }
   ];
-  let text = await callChatApi(messages, 200);
+  let text = await callChatApi(messages, 80);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-  if (text.length > 200) text = text.slice(0, 200);
+  if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 }
 

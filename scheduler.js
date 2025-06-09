@@ -59,7 +59,6 @@ const buyerHashtags =
     'aave',
     // DeFi primitives
     'finance',
-
     // Ecosystem buzz
     'arbitrum',
   ];
