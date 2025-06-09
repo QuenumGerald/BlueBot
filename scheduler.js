@@ -53,22 +53,21 @@ for (const hour of postTextHours) {
 
 
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
-const buyerHashtags = [
-  // Lending & yield
-  'lend', 'borrowing', 'apr', 'apy', 'yield farming',
-
-
-
-  // EVM & builders
-
-
-  // Ecosystem buzz
-  'layer2', 'zk rollup', 'arbitrum',
-];
+const buyerHashtags =
+  [// Cat lovers
+    // Lending & yield
+    'aave', 'apr', 'yield farming',
+    // DeFi primitives
+    'defi', 'liquidity', 'flash loan',
+    // EVM & builders
+    'ethereum', 'evm', 'smart contract',
+    // Ecosystem buzz
+    'layer2', 'zk rollup', 'arbitrum',
+  ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
 const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
-const likeFollowHours = [4, 12, 20]; // 3 créneaux, maxPerJob augmenté
+const likeFollowHours = [8, 10, 12, 14, 16, 20]; // 6 créneaux, maxPerJob augmenté
 const maxPerJob = 2; // 3 posts/hashtag/job pour +50%
 const delayMs = 3000; // délai inchangé
 
