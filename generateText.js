@@ -26,8 +26,16 @@ const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo'
 
 // Global constants -----------------------------------------------------
 const MAX_POST_LEN = 280   // posts are now strictly capped at 280 chars
-const MAX_REPLY_LEN = 120  // replies much shorter by design
+const MAX_REPLY_LEN = 220  // replies can be longer but still concise
 const MAX_PUNCH_LEN = 50    // ultra‑short punchlines
+
+// Troncature intelligente (ne coupe pas un mot)
+function smartTruncate(text, maxLen) {
+  if (text.length <= maxLen) return text;
+  const truncated = text.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
+}
 
 // ---------------------------------------------------------------------
 async function callChatApi(messages, maxTokens) {
@@ -43,9 +51,9 @@ async function callChatApi(messages, maxTokens) {
 // ---------------------------------------------------------------------
 // PROMPTS ---------------------------------------------------------------
 // ---------------------------------------------------------------------
-const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. 40% ultra-short (≤50 words), 60% meme (≤280 chars). Absolutely no sarcasm, negativity, or emoji. No financial advice, no crypto clichés.`
+const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
 
-const SYSTEM_REPLY = `You are Sparky, a witty, positive, and helpful flame. Your replies must be short (max 120 characters), clever, and make people smile. Whenever possible, sneak in a subtle, original nod to the project (testnet, whitelist, seed, etc.)—but only if it improves the joke. Never use sarcasm, negativity, or emoji. Never give financial advice or use crypto clichés.`
+const SYSTEM_REPLY = `You are Sparky, a witty, positive, and helpful flame. Your replies must be concise, clever, and make people smile. Whenever possible, sneak in a subtle, original nod to the project (testnet, whitelist, seed, etc.)—but only if it improves the joke. Never use sarcasm, negativity, or emoji (never use any emoji, not even 🔥). Never give financial advice or use crypto clichés. Never mention character count or reply length. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
 
 const topics = [
   'I just flash‑loaned caffeine instead of USDC',
@@ -92,7 +100,7 @@ export async function generateSparkyPostText() {
     const cta = objectiveCTAs[Math.floor(Math.random() * objectiveCTAs.length)]
     if ((text + ' ' + cta).length <= MAX_POST_LEN) text += ' ' + cta
   }
-  if (text.length > MAX_POST_LEN) text = text.slice(0, MAX_POST_LEN)
+  text = smartTruncate(text, MAX_POST_LEN);
   return text
 }
 
@@ -109,6 +117,8 @@ export async function generateReplyText(originalText) {
   text = text.replace(/[*_`~#>]/g, '').replace(/\s+/g, ' ').trim();
   // Supprime les crochets ou guillemets en début et fin de texte
   text = text.replace(/^["'“”«»\[\]\(\)\s]+|["'“”«»\[\]\(\)\s]+$/g, '');
-  if (text.length > MAX_REPLY_LEN) text = text.slice(0, MAX_REPLY_LEN)
+  // Supprime tous les emojis unicode
+  text = text.replace(/[\p{Emoji_Presentation}\p{Emoji}\u200d]+/gu, '');
+  text = smartTruncate(text, MAX_REPLY_LEN);
   return text
 }
