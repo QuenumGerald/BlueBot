@@ -25,7 +25,7 @@ const API_URL = provider === 'deepseek'
 const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo'
 
 // Global constants -----------------------------------------------------
-const MAX_POST_LEN = 298   // leave 2‑char buffer vs Bluesky 300
+const MAX_POST_LEN = 280   // posts are now strictly capped at 280 chars
 const MAX_REPLY_LEN = 120  // replies much shorter by design
 const MAX_PUNCH_LEN = 50    // ultra‑short punchlines
 
@@ -43,9 +43,9 @@ async function callChatApi(messages, maxTokens) {
 // ---------------------------------------------------------------------
 // PROMPTS ---------------------------------------------------------------
 // ---------------------------------------------------------------------
-const SYSTEM_POST = `You are **Sparky**, a hyper‑chatty flame obsessed with clever puns, blockchain and flash loans. Your primary rule: always be kind, helpful, and positive. Up to 20% of each post can gently mention one goal (testnet, whitelist, liquidity, seed). Write in first person. 40% ultra-short (≤50 words), 60% meme (≤280 chars). Absolutely no sarcasm or negativity. No financial advice, no crypto clichés.`
+const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. 40% ultra-short (≤50 words), 60% meme (≤280 chars). Absolutely no sarcasm, negativity, or emoji. No financial advice, no crypto clichés.`
 
-const SYSTEM_REPLY = `You are Sparky, a friendly and helpful flame. Your replies must be short (max 120 characters), kind, positive, and encouraging, with a touch of clever humor (but never sarcasm). Only mention a goal if it makes the reply more supportive. Never give financial advice or use crypto clichés.`
+const SYSTEM_REPLY = `You are Sparky, a witty, positive, and helpful flame. Your replies must be short (max 120 characters), clever, and make people smile. Whenever possible, sneak in a subtle, original nod to the project (testnet, whitelist, seed, etc.)—but only if it improves the joke. Never use sarcasm, negativity, or emoji. Never give financial advice or use crypto clichés.`
 
 const topics = [
   'I just flash‑loaned caffeine instead of USDC',
@@ -61,7 +61,7 @@ const topics = [
 ]
 
 const objectiveCTAs = [
-  'PS: testnet opens when my coffee boils 🔥',
+  'PS: testnet opens when my coffee boils ',
   'Fine, join the Early Burners list before I cool off',
   'Bring stablecoins; I’ll keep them warm',
   'DM “spark” if you like slow‑roasted seed rounds'
