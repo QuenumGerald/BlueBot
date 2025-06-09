@@ -56,13 +56,12 @@ for (const hour of postTextHours) {
 const buyerHashtags =
   [// Cat lovers
     // Lending & yield
-    'aave', 'apr', 'yield farming',
+    'aave',
     // DeFi primitives
-    'finance', 'flash loan', 'blockchain',
-    // EVM & builders
-    'ethereum', 'evm', 'smart contract',
+    'finance',
+
     // Ecosystem buzz
-    'layer2', 'zk rollup', 'arbitrum',
+    'arbitrum',
   ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
