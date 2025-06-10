@@ -54,19 +54,18 @@ for (const hour of postTextHours) {
 
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const buyerHashtags =
-  [// Cat lovers
-    // Lending & yield
-    'aave',
+  [ // Lending & yield
+    'crypto', 'cryptocurrency', 'web3',
     // DeFi primitives
     'finance',
-    // Ecosystem buzz
-    'arbitrum',
+    //dev
+    'typescript',
   ];
 
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
-const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
-const likeFollowHours = [8, 9, 11, 13, 15, 17]; // 6 créneaux, maxPerJob augmenté
-const maxPerJob = 2; // 3 posts/hashtag/job pour +50%
+const replyHours = [0, 2, 4, 10, 12, 14, 18, 20, 22]; // 12 créneaux pour plus de replies
+const likeFollowHours = [1, 3, 5, 7, 8, 9, 11, 12, 14, 16, 13, 15, 17, 18, 19, 20, 21, 22, 23]; // 6 créneaux, maxPerJob augmenté
+const maxPerJob = 3; // 3 posts/hashtag/job pour +50%
 const delayMs = 3000; // délai inchangé
 
 // Planification auto-reply 5 fois/jour (créneaux séparés)

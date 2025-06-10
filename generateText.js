@@ -48,7 +48,7 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0].message.content.trim()
 }
 
-const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
+const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes.`
 /**
  * Génère un texte pour un post mème Clippy (≤280 caractères)
  * @returns {Promise<string>}
@@ -61,28 +61,29 @@ export async function generateTrombonePostText() {
   // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
   // Thèmes adaptés à la première personne :
   const topics = [
-    "I just flash-loaned espresso—now my heart’s in debt ",
-    "I spread gas fees on toast for a crunchy breakfast",
-    "I hide private keys in the smoke so auditors cough",
-    "I nap in liquidity pools and charge rent to the whales",
-    "I think compound interest should literally burst into flame",
-    "I carved my whitepaper on a burnt match—minimum viable docs",
-    "I grill smart-contract bugs until they confess their reentrancy",
-    "I borrow faster than sparks gossip on Crypto-Twitter",
-    "I meditate by watching burnAddress balances turn to ash",
-    "I dream of single-block finality and an endless BBQ after-party"
+    "I calculated the Game Theory optimal strategy for my DeFi investments",
+    "My portfolio diversification theory includes at least 20% memes",
+    "I analyze market volatility the same way I analyze my coffee intake",
+    "My quantitative models predict a bull market in blockchain dad jokes",
+    "I'm developing a new economic indicator based on developer burnout rates",
+    "My research paper on tokenomics was rejected for excessive wordplay",
+    "I created a pricing model for the value of technical puns over time",
+    "I'm bullish on chain interoperability but bearish on serious conversations",
+    "My consensus algorithm: agree that my jokes deserve more validators",
+    "My economic white paper includes a section on humor as monetary policy"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.4;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.`;
+    userPrompt = `${randomTopic}
+Write a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Sparky is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
   } else {
     userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.` },
+    { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 280);
@@ -91,10 +92,11 @@ export async function generateTrombonePostText() {
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
   if (Math.random() < 0.20) {
     const hooks = [
-      'PS: testnet opens when my coffee boils ',
-      'Fine, join the Early Burners list before I cool off',
-      'Bring stablecoins; I’ll keep them warm',
-      'DM “spark” if you like slow‑roasted seed rounds'
+      'Like if my economic analysis made you smile. Follow for daily blockchain insights.',
+      'Follow for more crypto economics explained with humor. Your likes fuel my analysis.',
+      'Like if you agree! Follow for daily technical breakdowns with a side of wit.',
+      'More technical insights in your feed? Just hit follow. Likes help my algorithms.',
+      'Did this analysis help? Like to validate my model. Follow for daily blockchain wisdom.'
     ];
     const hook = hooks[Math.floor(Math.random() * hooks.length)];
     // Only add if it fits in 300 chars total
@@ -106,19 +108,19 @@ export async function generateTrombonePostText() {
 }
 
 export async function generatePostText() {
-  // Liste de topics/moods pour varier les posts
+  // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
-    "I just flash-loaned espresso—now my heart’s in debt ",
-    "I spread gas fees on toast for a crunchy breakfast",
-    "I hide private keys in the smoke so auditors cough",
-    "I nap in liquidity pools and charge rent to the whales",
-    "I think compound interest should literally burst into flame",
-    "I carved my whitepaper on a burnt match—minimum viable docs",
-    "I grill smart-contract bugs until they confess their reentrancy",
-    "I borrow faster than sparks gossip on Crypto-Twitter",
-    "I meditate by watching burnAddress balances turn to ash",
-    "I dream of single-block finality and an endless BBQ after-party"
+    "I calculated the Nash equilibrium for my coffee addiction",
+    "My econometric models predict blockchain jokes will outperform traditional humor by Q3",
+    "I tokenized my expertise and the liquidity pool is overflowing with bad puns",
+    "My technical analysis shows strong resistance levels against making sense",
+    "I hedge against boring conversations with derivatives of blockchain wordplay",
+    "I run Monte Carlo simulations on my jokes to maximize ROI (Return On Irony)",
+    "My regression analysis shows a strong correlation between DeFi adoption and my wit",
+    "I built a zero-knowledge proof that I'm actually funny",
+    "The efficient market hypothesis fails to explain why my jokes are undervalued",
+    "My economic forecast: high chance of technical innovation with scattered wordplay"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -126,13 +128,15 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.`;
+    userPrompt = `${randomTopic}
+Write a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Sparky is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}
+Write a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be written in the first person ("I", "my", "me") as if Sparky is speaking. Your post should provide insightful analysis on blockchain technology or economic trends. You can use up to 280 characters. Be technical but accessible. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
+      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -151,17 +155,16 @@ export async function generatePostText() {
 export async function generateReplyText(originalText) {
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your replies must always be creative, original, and make people smile. In every reply, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.
+      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your replies are insightful, precise, backed by deep domain knowledge, AND funny. You communicate advanced concepts in accessible language while being consistently witty. Prioritize humor even when discussing serious technical topics. Write in first person. Keep it under 280 characters. No emoji.
 
 ABSOLUTE FORBIDDENS:
-- Never give financial advice
-- Never joke about poverty, financial failure, or scams
 - Never use crypto clichés ("to the moon", "HODL", etc.)
-- Never use repetitive formulas or forced surprise
+- Never use repetitive formulas or forced language
+- Never be dry or overly academic
 
-Always vary your style, stay sizzling , and focus on jokes, flash loans, roasting bad yields, and melting gas fees!` },
+Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging.` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be extremely concise, less than 120 characters, and fit in a single witty line.`
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji. Your reply MUST be extremely concise, less than 120 characters, and be humorous while conveying an expert economic/technical insight. Prioritize wit and clever jokes even on serious topics.`
     }
   ];
   let text = await callChatApi(messages, 80);
