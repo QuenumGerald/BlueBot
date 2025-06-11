@@ -48,7 +48,7 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0].message.content.trim()
 }
 
-const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes. NEVER include any surprise effect in your response.`
+const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your signature phrase is "Keep the flame up 🔥" which you can use to end your messages. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes. NEVER include any surprise effect in your response.`
 
 /**
  * Génère un texte pour un post mème Clippy (≤280 caractères)
@@ -84,7 +84,7 @@ Write a new original post for Spark Protocol on Bluesky as a world-class economi
     userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: SYSTEM_POST },
+    { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 280);
@@ -129,15 +129,13 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}
-Write a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Sparky is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
+    userPrompt = `${randomTopic}\nWrite ONE single, original, extremely short meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 10 words. No markdown, no emojis, no line breaks, no enumeration.`;
   } else {
-    userPrompt = `${randomTopic}
-Write a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be written in the first person ("I", "my", "me") as if Sparky is speaking. Your post should provide insightful analysis on blockchain technology or economic trends. You can use up to 280 characters. Be technical but accessible. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite ONE single, original, concise meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 280 characters. No markdown, no emojis, no line breaks, no enumeration.`;
   }
   const messages = [
     {
-      role: 'system', content: SYSTEM_POST
+      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -165,12 +163,12 @@ ABSOLUTE FORBIDDENS:
 
 Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging.` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji. Your reply MUST be extremely concise (less than 120 characters). Use humor when possible, but prioritize being serious and helpful in your responses. Always convey expert economic/technical insight. NEVER include any surprise effect in your response.Your signature phrase is "Keep the flame up 🔥" which you can use to end your messages. `
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji. Your reply MUST be extremely concise, less than 120 characters, and be humorous while conveying an expert economic/technical insight. Prioritize wit and clever jokes even on serious topics.`
     }
   ];
   let text = await callChatApi(messages, 80);
-  text = text.replace(/[*_`~#>&\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-
+  text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 }
+
