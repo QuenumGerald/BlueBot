@@ -168,6 +168,8 @@ Balance technical accuracy with clever jokes and wordplay. Make economic and blo
   ];
   let text = await callChatApi(messages, 80);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+  // Supprime les guillemets en début et fin de réponse
+  text = text.replace(/^['"“”«»]+|['"“”«»]+$/g, '');
   if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 }
