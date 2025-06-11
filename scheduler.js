@@ -104,7 +104,7 @@ const buyerHashtags = [
 // [RÉDUIT] Suite à un avertissement Bluesky (mai 2025), fréquence divisée par 2, likes désactivés ailleurs.
 const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
 const likeFollowHours = [4, 12, 20]; // 3 créneaux, maxPerJob augmenté
-const maxPerJob = 3; // 3 posts/hashtag/job pour +50%
+const maxPerJob = 5; // 3 posts/hashtag/job pour +50%
 const delayMs = 3000; // délai inchangé
 
 // Planification auto-reply 5 fois/jour (créneaux séparés)
