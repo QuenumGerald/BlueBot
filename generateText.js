@@ -15,6 +15,7 @@ dotenv.config()
 // --------------------------------------------------------
 const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY
 const OPENAI_KEY = process.env.OPENAI_KEY
+
 const provider = DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null
 if (!provider) throw new Error('DEEPSEEK_KEY or OPENAI_KEY must be set in .env')
 
@@ -24,10 +25,6 @@ const API_URL = provider === 'deepseek'
 
 const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo'
 
-// Global constants -----------------------------------------------------
-const MAX_POST_LEN = 280   // posts are now strictly capped at 280 chars
-const MAX_REPLY_LEN = 220  // replies can be longer but still concise
-const MAX_PUNCH_LEN = 50    // ultra‑short punchlines
 
 // Troncature intelligente (ne coupe pas un mot)
 function smartTruncate(text, maxLen) {
@@ -50,6 +47,22 @@ async function callChatApi(messages, maxTokens) {
 
 const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your signature phrase is "Keep the flame up 🔥" which you can use to end your messages. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
 
+const data = {
+  model,
+  messages,
+  max_tokens: maxTokens,
+  temperature: 1.5,
+};
+try {
+  const response = await axios.post(url, data, { headers });
+  // DeepSeek/OpenAI: .choices[0].message.content
+  return response.data.choices[0].message.content.trim();
+} catch (error) {
+  console.error('Erreur lors de la génération de texte :', error?.response?.data || error.message);
+  throw error;
+}
+
+
 /**
  * Génère un texte pour un post mème Clippy (≤280 caractères)
  * @returns {Promise<string>}
@@ -62,16 +75,16 @@ export async function generateTrombonePostText() {
   // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
   // Thèmes adaptés à la première personne :
   const topics = [
-    "I calculated the Game Theory optimal strategy for my DeFi investments",
-    "My portfolio diversification theory includes at least 20% memes",
-    "I analyze market volatility the same way I analyze my coffee intake",
-    "My quantitative models predict a bull market in blockchain dad jokes",
-    "I'm developing a new economic indicator based on developer burnout rates",
-    "My research paper on tokenomics was rejected for excessive wordplay",
-    "I created a pricing model for the value of technical puns over time",
-    "I'm bullish on chain interoperability but bearish on serious conversations",
-    "My consensus algorithm: agree that my jokes deserve more validators",
-    "My economic white paper includes a section on humor as monetary policy"
+    "I calculated optimal Game Theory; ignored it anyway",
+    "My diversification includes 15% memes, 85% hope",
+    "I analyze volatility like I analyze caffeine crashes",
+    "My models predict bullish trends for sarcastic tweets",
+    "I developed an economic indicator based on dev tears",
+    "My tokenomics paper rejected—too many puns, not enough math",
+    "I priced technical jokes; returns diminish exponentially",
+    "Bullish on interoperability, bearish on seriousness",
+    "My consensus algo: unanimous laughter at my own jokes",
+    "My economic thesis treats humor as reserve currency"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
@@ -87,7 +100,7 @@ Write a new original post for Spark Protocol on Bluesky as a world-class economi
     { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 100);
+  let text = await callChatApi(messages, 200);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
@@ -112,16 +125,16 @@ export async function generatePostText() {
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
-    "I calculated the Nash equilibrium for my coffee addiction",
-    "My econometric models predict blockchain jokes will outperform traditional humor by Q3",
-    "I tokenized my expertise and the liquidity pool is overflowing with bad puns",
-    "My technical analysis shows strong resistance levels against making sense",
-    "I hedge against boring conversations with derivatives of blockchain wordplay",
-    "I run Monte Carlo simulations on my jokes to maximize ROI (Return On Irony)",
-    "My regression analysis shows a strong correlation between DeFi adoption and my wit",
-    "I built a zero-knowledge proof that I'm actually funny",
-    "The efficient market hypothesis fails to explain why my jokes are undervalued",
-    "My economic forecast: high chance of technical innovation with scattered wordplay"
+    "I modeled the Nash equilibrium of my espresso habit",
+    "My econometrics predict blockchain humor bull run by Q3",
+    "I tokenized my jokes; liquidity flooded with bad puns",
+    "My TA chart shows strong resistance to logical sense",
+    "I hedge dull talks using blockchain wordplay derivatives",
+    "I Backtested my punchlines; high irony ROI",
+    "Regression analysis links DeFi adoption to my sarcasm",
+    "I wrote a zero-knowledge proof verifying I'm hilarious",
+    "Efficient market hypothesis undervalues my joke portfolio",
+    "Economic forecast: innovation front, wordplay showers"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -129,13 +142,13 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite ONE single, original, extremely short meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 10 words. No markdown, no emojis, no line breaks, no enumeration. Keep it under 100 characters.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Example: 'I lend. Interest follows me home.' or 'Liquidity whispered, I replied with code.' or 'Testnet today, mainnet tomorrow, coffe always.' Only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite ONE single, original, concise meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 150 characters. No markdown, no emojis, no line breaks, no enumeration. Absolutely do not exceed 150 characters.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
+      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). No emoji.Never use emojis, markdown, or formatting symbols. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -163,14 +176,12 @@ ABSOLUTE FORBIDDENS:
 
 Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging.` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji. Your reply MUST be extremely concise, less than 120 characters, and be humorous while conveying an expert economic/technical insight. Prioritize wit and clever jokes even on serious topics.`
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji , no bullet points.`
     }
   ];
-  let text = await callChatApi(messages, 80);
+  let text = await callChatApi(messages, 200);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-  // Supprime les guillemets en début et fin de réponse
-  text = text.replace(/^['"“”«»]+|['"“”«»]+$/g, '');
-  if (text.length > 280) text = text.slice(0, 280);
+  if (text.length > 200) text = text.slice(0, 200);
   return text.trim();
 }
 
