@@ -75,7 +75,7 @@ export async function generateTrombonePostText() {
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
-  const isShort = Math.random() < 0.4;
+  const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
     userPrompt = `${randomTopic}
@@ -87,7 +87,7 @@ Write a new original post for Spark Protocol on Bluesky as a world-class economi
     { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 280);
+  let text = await callChatApi(messages, 100);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
