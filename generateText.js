@@ -84,7 +84,7 @@ export async function generateTrombonePostText() {
     { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 200);
+  let text = await callChatApi(messages, 100);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
@@ -136,11 +136,11 @@ export async function generatePostText() {
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 280);
+  let text = await callChatApi(messages, 100);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Coupe intelligemment à 280 caractères max (posts plus courts)
-  if (text.length > 280) text = smartTruncate(text, 280);
+  if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 
 }
@@ -151,7 +151,7 @@ export async function generatePostText() {
 export async function generateReplyText(originalText) {
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your replies are insightful, precise, backed by deep domain knowledge, AND funny. You communicate advanced concepts in accessible language while being consistently witty. Prioritize humor even when discussing serious technical topics. Write in first person. Keep it under 280 characters. No emoji. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.
+      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your replies are insightful, precise, backed by deep domain knowledge, AND funny. You communicate advanced concepts in accessible language while being consistently witty. Prioritize humor even when discussing serious technical topics. Write in first person. No emoji. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply (max 200 characters).
 
 ABSOLUTE FORBIDDENS:
 - Never use crypto clichés ("to the moon", "HODL", etc.)
@@ -163,7 +163,7 @@ Balance technical accuracy with clever jokes and wordplay. Make economic and blo
       role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji , no bullet points.`
     }
   ];
-  let text = await callChatApi(messages, 200);
+  let text = await callChatApi(messages, 100);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 200) text = text.slice(0, 200);
   return text.trim();
