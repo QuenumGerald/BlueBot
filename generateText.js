@@ -125,13 +125,13 @@ export async function generatePostText() {
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-  // Tirage aléatoire pour la longueur du post (50% court, 50% moyen/long)
-  const isShort = Math.random() < 0.5;
+  // Tirage aléatoire pour la longueur du post (80% court, 20% moyen/long)
+  const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite ONE single, original, extremely short meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 10 words. No markdown, no emojis, no line breaks, no enumeration.`;
+    userPrompt = `${randomTopic}\nWrite ONE single, original, extremely short meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 10 words. No markdown, no emojis, no line breaks, no enumeration. Keep it under 100 characters.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite ONE single, original, concise meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 280 characters. No markdown, no emojis, no line breaks, no enumeration.`;
+    userPrompt = `${randomTopic}\nWrite ONE single, original, concise meme post for Sparky on Bluesky as a world-class economist and tech expert. It MUST be a single, standalone phrase (not a list, not a thread), written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Maximum 150 characters. No markdown, no emojis, no line breaks, no enumeration. Absolutely do not exceed 150 characters.`;
   }
   const messages = [
     {
@@ -139,11 +139,11 @@ export async function generatePostText() {
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 200);
+  let text = await callChatApi(messages, 280);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-  // Coupe à 280 caractères max
-  if (text.length > 280) text = text.slice(0, 280);
+  // Coupe intelligemment à 280 caractères max (posts plus courts)
+  if (text.length > 280) text = smartTruncate(text, 280);
   return text.trim();
 
 }
