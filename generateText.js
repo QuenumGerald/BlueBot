@@ -13,17 +13,20 @@ dotenv.config()
 // --------------------------------------------------------
 // Provider selection ---------------------------------------------------
 // --------------------------------------------------------
-const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY
-const OPENAI_KEY = process.env.OPENAI_KEY
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
+const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY;
+const OPENAI_KEY = process.env.OPENAI_KEY;
 
-const provider = DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null
-if (!provider) throw new Error('DEEPSEEK_KEY or OPENAI_KEY must be set in .env')
+const provider = GEMINI_KEY ? 'gemini' : DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null;
+if (!provider) throw new Error('GEMINI_API_KEY, DEEPSEEK_KEY or OPENAI_KEY must be set in .env');
 
 const API_URL = provider === 'deepseek'
   ? 'https://api.deepseek.com/v1/chat/completions'
-  : 'https://api.openai.com/v1/chat/completions'
+  : provider === 'openai'
+    ? 'https://api.openai.com/v1/chat/completions'
+    : null;
 
-const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo'
+const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo';
 
 
 // Troncature intelligente (ne coupe pas un mot)
@@ -35,14 +38,33 @@ function smartTruncate(text, maxLen) {
 }
 
 // ---------------------------------------------------------------------
+async function callGeminiApi(messages, maxTokens = 30) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+  // On concatène tous les messages (system + user) pour le prompt Gemini
+  const prompt = messages.map(m => m.content).join('\n');
+  const body = {
+    contents: [
+      {
+        parts: [{ text: prompt }]
+      }
+    ]
+  };
+  const headers = { 'Content-Type': 'application/json' };
+  const { data } = await axios.post(url, body, { headers });
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+}
+
 async function callChatApi(messages, maxTokens) {
+  if (provider === 'gemini') {
+    return await callGeminiApi(messages, maxTokens);
+  }
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`
-  }
-  const body = { model: MODEL, messages, max_tokens: maxTokens, temperature: 1.5 }
-  const { data } = await axios.post(API_URL, body, { headers })
-  return data.choices[0].message.content.trim()
+  };
+  const body = { model: MODEL, messages, max_tokens: maxTokens, temperature: 1.5 };
+  const { data } = await axios.post(API_URL, body, { headers });
+  return data.choices[0].message.content.trim();
 }
 
 const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your signature phrase is "Keep the flame up 🔥" which you can use to end your messages. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
@@ -84,7 +106,7 @@ export async function generateTrombonePostText() {
     { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 100);
+  let text = await callChatApi(messages, 50);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
@@ -136,7 +158,7 @@ export async function generatePostText() {
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 100);
+  let text = await callChatApi(messages, 30);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Coupe intelligemment à 280 caractères max (posts plus courts)
@@ -155,17 +177,17 @@ export async function generateReplyText(originalText) {
 
 ABSOLUTE FORBIDDENS:
 - Never use crypto clichés ("to the moon", "HODL", etc.)
-- Never use repetitive formulas or forced language
+- Never use emojis, markdown, or formatting symbols
 - Never be dry or overly academic
+- Never be sarcastic, mocking, or mean. Humor must always be positive, friendly, and never at the expense of others.
 
-Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging.` },
+Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging, but always with a positive, encouraging tone.` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji , no bullet points.`
+      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be a single witty sentence, strictly less than 50 characters.`
     }
   ];
-  let text = await callChatApi(messages, 100);
+  let text = await callChatApi(messages, 20);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-  if (text.length > 200) text = text.slice(0, 200);
+  if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 }
-
