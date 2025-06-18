@@ -1,5 +1,5 @@
 // autoReply.js
-// Répond automatiquement aux 10 derniers posts #CLIPPY avec une réponse IA
+// Répond automatiquement aux posts pertinents pour la recherche d'emploi à Silicon Valley
 
 import { agent, initBluesky } from './bluesky.js';
 import { generateReplyText } from './generateText.js';
@@ -118,28 +118,25 @@ export async function autoReply() {
     // Charge l'historique des réponses
     const replyHistory = loadReplyHistory();
 
-
     // Limite différente selon le mode (test ou production)
     const isTest = process.env.NODE_ENV === 'test';
     // Limite recommandée Bluesky :
     // - Pas plus de 100-200 replies/jour
     // - MAX_REPLIES_PER_RUN = 10 si scheduler toutes les 20-30 min
-    const MAX_REPLIES_PER_RUN = 5; // [RÉDUIT] Limite divisée par 2 suite à un avertissement Bluesky (mai 2025)
+    const MAX_REPLIES_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
-    // Termes de recherche pour trouver des posts intéressants (sans hashtags)
-    const searchTerms = ['webdev', 'api',
-      'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
-      'opensource', 'dev', 'developer', 'coding', 'machinelearning',
+    // Termes de recherche pour trouver des posts pertinents pour la recherche d'emploi
+    const searchTerms = [
+
+      // Termes liés à Silicon Valley
+      'silicon valley', 'san francisco', 'bay area', 'sf tech', 'palo alto',
+      'menlo park', 'mountain view', 'sunnyvale', 'santa clara', 'cupertino',
+
     ];
 
-
+    // Récupère les posts récents contenant les termes de recherche
     const allPosts = [];
-    if (!agent.session || !agent.session.did) {
-      console.error('[ERREUR] L’agent Bluesky n’est pas authentifié. Vérifiez vos identifiants et la connexion.');
-      return;
-    }
-
     for (const term of searchTerms) {
       console.log(`[Recherche] Récupération des 10 derniers posts contenant "${term}"`);
       // Recherche par terme (hashtag ou mots-clés)

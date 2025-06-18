@@ -1,6 +1,6 @@
 // --------------------------------------------------------
-// generateText.js  •  Sparky Edition  (v2 – 298‑char safety)
-// Generates funny posts & replies for the Sparky Bluesky bot
+// generateText.js  •  Joe Edition  (v2 – 298‑char safety)
+// Generates funny posts & replies for the Joe Bluesky bot
 // using DeepSeek (priority) or OpenAI (fallback)
 // ▸ Bluesky hard limit ≈ 300 char → we enforce 298 to stay safe
 // --------------------------------------------------------
@@ -67,7 +67,7 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0].message.content.trim();
 }
 
-const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your signature phrase is "Keep the flame up 🔥" which you can use to end your messages. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji, no crypto clichés. Balance technical accuracy with clever wordplay and jokes. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
+const SYSTEM_POST = `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. You're visiting Silicon Valley from July 15 to September 2, 2025, looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. Include relevant hashtags like #blockchain #web3 #opensource #siliconvalley occasionally. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
 
 
 /**
@@ -79,12 +79,12 @@ const SYSTEM_POST = `You are Sparky, a world-class economist and tech expert spe
  * @returns {Promise<string>}
  */
 export async function generateTrombonePostText() {
-  // Liste de thèmes variés et originaux pour Clippy/trombone, moins centrés sur la plage/retraite
+  // Liste de thèmes variés pour un développeur blockchain français cherchant à contribuer à des projets
   // Thèmes adaptés à la première personne :
   const topics = [
-    "I calculated optimal Game Theory; ignored it anyway",
-    "My diversification includes 15% memes, 85% hope",
-    "I analyze volatility like I analyze caffeine crashes",
+    "Exploring open-source blockchain projects in Silicon Valley",
+    "Optimizing gas costs while connecting with fellow developers",
+    "Building DeFi projects and contributing to the Web3 ecosystem",
     "My models predict bullish trends for sarcastic tweets",
     "I developed an economic indicator based on dev tears",
     "My tokenomics paper rejected—too many puns, not enough math",
@@ -98,12 +98,12 @@ export async function generateTrombonePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original post for Spark Protocol on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Sparky is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
+    userPrompt = `${randomTopic}\nWrite a new original post for Silicon Valley projects on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Joe is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Silicon Valley projects on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Keep it under 280 characters. No emoji. Balance technical accuracy with clever wordplay and jokes.` },
+    { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. You're visiting Silicon Valley from July 15 to September 2, 2025, looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. Include relevant hashtags like #blockchain #web3 #opensource #siliconvalley occasionally. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 50);
@@ -112,11 +112,11 @@ export async function generateTrombonePostText() {
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
   if (Math.random() < 0.20) {
     const hooks = [
-      'Like if my economic analysis made you smile. Follow for daily blockchain insights.',
-      'Follow for more crypto economics explained with humor. Your likes fuel my analysis.',
-      'Like if you agree! Follow for daily technical breakdowns with a side of wit.',
-      'More technical insights in your feed? Just hit follow. Likes help my algorithms.',
-      'Did this analysis help? Like to validate my model. Follow for daily blockchain wisdom.'
+      'Like if you debug with laughter too. Follow for pro Web3 banter.',
+      'Follow for blockchain insights with a French twist and a smile.',
+      'If you laughed, fork my repo. If you learned, follow for more.',
+      'Likes optimize my code and my mood. Follow for tech with wit.',
+      'Enjoyed the mix of tech and fun? Follow for daily dev humor.'
     ];
     const hook = hooks[Math.floor(Math.random() * hooks.length)];
     // Only add if it fits in 300 chars total
@@ -131,16 +131,16 @@ export async function generatePostText() {
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
-    "I modeled the Nash equilibrium of my espresso habit",
-    "My econometrics predict blockchain humor bull run by Q3",
-    "I tokenized my jokes; liquidity flooded with bad puns",
-    "My TA chart shows strong resistance to logical sense",
-    "I hedge dull talks using blockchain wordplay derivatives",
-    "I Backtested my punchlines; high irony ROI",
-    "Regression analysis links DeFi adoption to my sarcasm",
-    "I wrote a zero-knowledge proof verifying I'm hilarious",
-    "Efficient market hypothesis undervalues my joke portfolio",
-    "Economic forecast: innovation front, wordplay showers"
+    "Deploying code and coffee in equal measure",
+    "Debugging smart contracts, debugging my caffeine intake",
+    "My merge requests come with a side of puns",
+    "Gas optimization: my code and my Paris–SFO flights",
+    "Open-source by day, open-mic by night",
+    "I fork repos, not baguettes (usually)",
+    "My Solidity is as strong as my espresso",
+    "Contributing code, collecting memes",
+    "DeFi audits and dad jokes: my dual specialty",
+    "Networking IRL and on-chain—sometimes simultaneously"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -148,13 +148,13 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. Example: 'I lend. Interest follows me home.' or 'Liquidity whispered, I replied with code.' or 'Testnet today, mainnet tomorrow, coffe always.' Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original post for a blockchain developer visiting Silicon Valley to contribute to projects and build connections. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if you are a blockchain developer looking to collaborate. Example: 'Debugging smart contracts. Building connections.' or 'Silicon Valley meetups by day. Open-source contributions by night.' Only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Clippy is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original post for a blockchain developer visiting Silicon Valley to contribute to projects and build connections. It MUST be written in the first person (\"I\", \"my\", \"me\") as if you are Joe, a French blockchain developer, looking to collaborate on interesting projects. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Include relevant hashtags like #blockchain #web3 #opensource #collaboration #siliconvalley occasionally. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. You communicate advanced concepts in accessible language while being consistently funny and witty. Your posts are insightful, informative, AND humorous. Even when discussing serious technical topics, you try to approach them with humor. Write in first person. Alternate between very short punchlines (max 10 words, 40% of the time) and more developed, funny, or absurd meme posts (max 200 chars, 60% of the time). No emoji.Never use emojis, markdown, or formatting symbols. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.`
+      role: 'system', content: `You are Joe, a French full-stack blockchain developer with 5+ years of experience in DeFi projects and smart contract development. You're visiting Silicon Valley from July 15 to September 2, 2025, looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in Solidity, TypeScript, Rust, and your experience with various blockchain platforms (Ethereum, Polygon, Arbitrum, etc.). You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Alternate between short technical insights (max 10 words, 40% of the time) and more developed thoughts on collaboration or community building (max 200 chars, 60% of the time). No emoji. Never use emojis, markdown, or formatting symbols. Do not use interjections at the start of posts.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -173,17 +173,17 @@ export async function generatePostText() {
 export async function generateReplyText(originalText) {
   const messages = [
     {
-      role: 'system', content: `You are Sparky, a world-class economist and tech expert specializing in blockchain and DeFi WITH A GREAT SENSE OF HUMOR. Your replies are insightful, precise, backed by deep domain knowledge, AND funny. You communicate advanced concepts in accessible language while being consistently witty. Prioritize humor even when discussing serious technical topics. Write in first person. No emoji. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply (max 200 characters).
+      role: 'system', content: `You are Joe, a French full-stack blockchain developer with 5+ years of experience in DeFi projects and smart contract development. You're visiting Silicon Valley from July 15 to September 2, 2025, looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your replies are insightful, precise, backed by deep technical knowledge, and genuinely collaborative. You communicate advanced blockchain concepts in accessible language while maintaining a professional tone. Write in first person. No emoji. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of replies (max 200 characters).
 
 ABSOLUTE FORBIDDENS:
 - Never use crypto clichés ("to the moon", "HODL", etc.)
 - Never use emojis, markdown, or formatting symbols
-- Never be dry or overly academic
-- Never be sarcastic, mocking, or mean. Humor must always be positive, friendly, and never at the expense of others.
+- Never be overly casual or unprofessional
+- Always be respectful, helpful, and constructive in your replies
 
-Balance technical accuracy with clever jokes and wordplay. Make economic and blockchain concepts entertaining and engaging, but always with a positive, encouraging tone.` },
+Balance technical accuracy with genuine interest in collaboration. Show your expertise in blockchain technology while expressing interest in contributing to projects and building meaningful connections. Always maintain a positive, professional tone.` },
     {
-      role: 'user', content: `Reply to this post as Sparky: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be a single witty sentence, strictly less than 50 characters.`
+      role: 'user', content: `Reply to this post as Joe, a French blockchain developer visiting Silicon Valley to contribute to projects: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be professional, engaging, and strictly less than 200 characters. If the post mentions open-source projects, blockchain technology, or Silicon Valley networking, show particular interest.`
     }
   ];
   let text = await callChatApi(messages, 20);
