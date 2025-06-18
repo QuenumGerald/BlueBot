@@ -55,15 +55,10 @@ for (const hour of postTextHours) {
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const projectCollabHashtags =
   [ // Blockchain & Web3
-    'blockchain', 'web3', 'crypto', 'ethereum', 'solidity', 'defi',
     // Open-source & Collaboration
-    'opensource', 'collaboration', 'community', 'developers', 'hackathon',
     // Silicon Valley
     'siliconvalley', 'sanfrancisco', 'bayarea', 'startups', 'techcommunity',
     // Tech skills
-    'typescript', 'javascript', 'rust', 'reactjs', 'frontend', 'fullstack',
-    // Projects & Communities
-    'coinbase', 'opensea', 'consensys', 'a16z', 'paradigm', 'gitcoin'
   ];
 
 // Configuration spéciale pour les contributions et le networking à Silicon Valley (15 juillet - 2 septembre 2025)
@@ -77,9 +72,9 @@ import { autoReply } from './autoReply.js';
 for (const hour of replyHours) {
   jobs.schedule(async () => {
     try {
-      console.log(`[BlazeJob] [START] Job autoReply ${hour}h (Mode Collaboration Silicon Valley)`);
+      console.log(`[BlazeJob] [START] Job autoReply ${hour}h`);
       await autoReply();
-      console.log(`[BlazeJob] [END] Job autoReply ${hour}h (Mode Collaboration Silicon Valley)`);
+      console.log(`[BlazeJob] [END] Job autoReply ${hour}h`);
     } catch (err) {
       console.error(`[BlazeJob][ERROR] Job autoReply ${hour}h :`, err);
     }
