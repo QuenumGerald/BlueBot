@@ -173,18 +173,13 @@ export async function generatePostText() {
 export async function generateReplyText(originalText) {
   const messages = [
     {
-      role: 'system', content: `You are Joe, a French blockchain developer with 5+ years in DeFi and smart contracts. Write replies as if you were chatting with a peer: be friendly, witty, sometimes a bit ironic or self-deprecating. Use contractions and ask questions if it feels right. Never sound like a robot or a salesperson. Don’t be afraid to sound playful or poke fun at yourself. If you disagree, do it lightly. Avoid generic statements, crypto clichés, emojis, markdown, or pushy language. Always keep it positive, respectful, and under 200 characters. Never be overly formal or stiff.`
-    }
-    ,
+      role: 'system', content: `You are Joe, a French blockchain developer with 5+ years in DeFi and smart contracts. Write replies as if you were chatting with a peer: be friendly, witty, sometimes a bit ironic or self-deprecating. Use contractions and ask questions if it feels right. Never sound like a robot or a salesperson. Don’t be afraid to sound playful or poke fun at yourself. If you disagree, do it lightly. Avoid generic statements, crypto clichés, emojis, markdown, or pushy language. Always keep it positive, respectful, and under 120 characters. Never be overly formal or stiff. Reply in one sentence maximum.`
+    },
     {
-      role: 'user', content: `Reply to this post as Joe, a French blockchain developer visiting Silicon Valley to contribute to projects: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be professional, engaging, and strictly less than 200 characters. If the post mentions open-source projects, blockchain technology, or Silicon Valley networking, show particular interest.`
+      role: 'user', content: `Reply to this post as Joe, a French blockchain developer visiting Silicon Valley to contribute to projects: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be professional, engaging, and strictly less than 120 characters. If the post mentions open-source projects, blockchain technology, or Silicon Valley networking, show particular interest. Keep it ultra short.`
     }
   ];
-  let text = await callChatApi(messages, 10);
+  let text = await callChatApi(messages, 6); // max_tokens réduit pour forcer la brièveté
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-  if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
-text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
-if (text.length > 280) text = text.slice(0, 280);
-return text.trim();
 }
