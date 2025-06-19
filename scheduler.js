@@ -30,7 +30,7 @@ const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
 const isTest = process.env.NODE_ENV === 'test';
 
 // 3 posts texte courts (sans image) chaque jour à 9h, 13h et 17h
-const postTextHours = [9, 13, 17]; // 3 posts texte par jour
+const postTextHours = [9, 13, 17, 21, 22, 23]; // 3 posts texte par jour
 for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
