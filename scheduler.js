@@ -89,7 +89,7 @@ for (const hour of likeFollowHours) {
   jobs.schedule(async () => {
     try {
       console.log(`[BlazeJob] [START] Job like/follow ${hour}h`);
-      for (const hashtag of buyerHashtags) {
+      for (const hashtag of projectCollabHashtags) {
         await likeAndFollowHashtag(hashtag, maxPerJob, delayMs);
       }
       console.log(`[BlazeJob] [END] Job like/follow ${hour}h`);
