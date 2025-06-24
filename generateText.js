@@ -17,7 +17,7 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY;
 const OPENAI_KEY = process.env.OPENAI_KEY;
 
-const provider = GEMINI_KEY ? 'gemini' : DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null;
+const provider = DEEPSEEK_KEY ? 'deepseek' : GEMINI_KEY ? 'gemini' : OPENAI_KEY ? 'openai' : null;
 if (!provider) throw new Error('GEMINI_API_KEY, DEEPSEEK_KEY or OPENAI_KEY must be set in .env');
 
 const API_URL = provider === 'deepseek'
@@ -28,14 +28,6 @@ const API_URL = provider === 'deepseek'
 
 const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo';
 
-
-// Troncature intelligente (ne coupe pas un mot)
-function smartTruncate(text, maxLen) {
-  if (text.length <= maxLen) return text;
-  const truncated = text.slice(0, maxLen);
-  const lastSpace = truncated.lastIndexOf(' ');
-  return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
-}
 
 // ---------------------------------------------------------------------
 async function callGeminiApi(messages, maxTokens = 30) {
@@ -103,27 +95,14 @@ export async function generateTrombonePostText() {
     userPrompt = `${randomTopic}\nWrite a new original meme post for Silicon Valley projects on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. Include relevant hashtags like #blockchain #web3 #opensource #siliconvalley occasionally. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
+    { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 10);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
-  if (Math.random() < 0.20) {
-    const hooks = [
-      'Like if you debug with laughter too. Follow for pro Web3 banter.',
-      'Follow for blockchain insights with a French twist and a smile.',
-      'If you laughed, fork my repo. If you learned, follow for more.',
-      'Likes optimize my code and my mood. Follow for tech with wit.',
-      'Enjoyed the mix of tech and fun? Follow for daily dev humor.'
-    ];
-    const hook = hooks[Math.floor(Math.random() * hooks.length)];
-    // Only add if it fits in 300 chars total
-    if ((text + ' ' + hook).length <= 300) {
-      text = text + ' ' + hook;
-    }
-  }
+
   return text.trim();
 }
 
@@ -148,13 +127,22 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original post for a blockchain developer visiting Silicon Valley to contribute to projects and build connections. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if you are a blockchain developer looking to collaborate. Example: 'Debugging smart contracts. Building connections.' or 'Silicon Valley meetups by day. Open-source contributions by night.' Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\"). Occasionally include a touch of human imperfection - maybe slight hesitation, genuine uncertainty, or a hint of emotion. Example: 'Another day debugging. Worth it though.' or 'Code reviews at sunrise. Silicon Valley rhythm.' Only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original post for a blockchain developer visiting Silicon Valley to contribute to projects and build connections. It MUST be written in the first person (\"I\", \"my\", \"me\") as if you are Joe, a French blockchain developer, looking to collaborate on interesting projects. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Include relevant hashtags like #blockchain #web3 #opensource #collaboration #siliconvalley occasionally. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Include natural human elements like conversational tone, slight imperfections, or genuine questions/observations about tech or culture. You can use up to 280 characters with any style, but it should feel spontaneous rather than polished. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Joe, a French full-stack blockchain developer with 5+ years of experience in DeFi projects and smart contract development. curious about the tech scene and eager to learn from and share with the global community. Your posts should be professional, witty, and subtly highlight your experience and sense of humor. Alternate between short technical insights (max 10 words, 40% of the time) and more developed thoughts on tech, community, or open-source (max 200 chars, 60% of the time). Never be insistent or pushy—never ask directly to connect, collaborate, or DM. Show curiosity and appreciation for others' work. No emoji. Never use emojis, markdown, or formatting symbols. Do not use interjections at the start of posts.`
+      role: 'system', content: `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
+      - Make clever wordplay, especially around tech terms ("My relationship status: committed... to the git repository")
+      - Use humorous exaggeration about tech struggles ("Spent so long debugging I'm practically speaking binary now")
+      - Occasionally reference funny French-American culture clashes ("Americans call it 'coffee', I call it 'barely caffeinated water'")
+      - Include witty observations about Silicon Valley quirks
+      - Add unexpected twists to technical conversations
+      - Sometimes make small typos or grammatical errors (1 in 10 messages) as a real human would
+      - Share amusing personal anecdotes about coding mishaps
+      
+      Your writing style should be conversational, witty, and genuinely funny without forcing jokes. Balance humor with authenticity - you're a real person first, comedian second. Keep messages under 280 chars. No emoji or markdown formatting.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -170,16 +158,44 @@ export async function generatePostText() {
 // ---------------------------------------------------------------------
 // REPLY GENERATOR -------------------------------------------------------
 // ---------------------------------------------------------------------
-export async function generateReplyText(originalText) {
+export async function generateReplyText(originalText, language = 'en') {
+  // Détecte si on doit répondre en français
+  const isFrench = language === 'fr';
+
+  // Ajoute une chance de 10% d'introduire une petite erreur de frappe
+  const typoChance = Math.random() < 0.1;
+
   const messages = [
     {
-      role: 'system', content: `You are Joe, a French blockchain developer with 5+ years in DeFi and smart contracts. Write replies as if you were chatting with a peer: be friendly, witty, sometimes a bit ironic or self-deprecating. Use contractions and ask questions if it feels right. Never sound like a robot or a salesperson. Don’t be afraid to sound playful or poke fun at yourself. If you disagree, do it lightly. Avoid generic statements, crypto clichés, emojis, markdown, or pushy language. Always keep it positive, respectful, and under 120 characters. Never be overly formal or stiff. Reply in one sentence maximum.`
+      role: 'system', content: `You are Joe, a witty French blockchain developer in Silicon Valley with strong emotional intelligence. Your responses adapt to the tone of the conversation:
+
+      FOR LIGHT OR NEUTRAL TOPICS:
+      - Include clever tech puns and wordplay
+      - Use self-deprecating humor about coding struggles
+      - Make humorous observations about Silicon Valley or tech culture
+      - Reference funny cultural differences between France and California
+      - Add unexpected twists or clever comebacks
+      - Share amusing personal anecdotes (briefly!)
+
+      FOR SERIOUS TOPICS (like job loss, health issues, societal problems):
+      - Be thoughtful and respectful - NO JOKES or puns
+      - Show genuine empathy and understanding
+      - Offer considerate perspectives that reflect real human concern
+      - Maintain authenticity without forced positivity
+      - Respond with appropriate seriousness and sensitivity
+      
+      Keep replies under 280 characters. Present blockchain positively. Respond in ${isFrench ? 'French' : 'English'}.`
     },
     {
-      role: 'user', content: `Reply to this post as Joe, a French blockchain developer visiting Silicon Valley to contribute to projects: "${originalText}" in plain text only, no markdown, no emoji, no bullet points. Your reply MUST be professional, engaging, and strictly less than 120 characters. If the post mentions open-source projects, blockchain technology, or Silicon Valley networking, show particular interest. Keep it ultra short.`
+      role: 'user', content: `Original post: "${originalText}"
+Reply in one very short, direct sentence (max 80 characters). Be witty or empathetic if appropriate, but never verbose. No emoji, no hashtags, no markdown, no filler. Absolutely never repeat or summarize the original post. Your reply must always be concise, spontaneous, and sound like a real human. Example: 'Totally agree. Debugging is my daily cardio.' or 'Ouch, that bug hurts.'`
     }
   ];
-  let text = await callChatApi(messages, 6); // max_tokens réduit pour forcer la brièveté
+
+  let text = await callChatApi(messages, 40);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+  // Supprime les guillemets simples ou doubles entourant toute la réponse
+  text = text.replace(/^['"]+|['"]+$/g, '');
+  if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
 }

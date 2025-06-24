@@ -6,6 +6,7 @@ import { generateReplyText } from './generateText.js';
 import fs from 'fs';
 import path from 'path';
 import { franc } from 'franc-min';
+import { checkQuota, recordAction } from './quotaManager.js';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -122,7 +123,17 @@ export async function autoReply() {
     const isTest = process.env.NODE_ENV === 'test';
     // Limite recommandée Bluesky :
     // - Pas plus de 100-200 replies/jour
-    // - MAX_REPLIES_PER_RUN = 10 si scheduler toutes les 20-30 min
+    // - Implémenté via quotaManager (25 replies/heure, 100 replies/jour)
+    
+    // Vérification des quotas de réponses
+    const replyQuota = checkQuota('reply');
+    if (!replyQuota.allowed) {
+      console.log(`[QuotaManager][INFO] Quota de répliques atteint: ${replyQuota.hourlyUsage}/${replyQuota.hourlyLimit} par heure, ${replyQuota.dailyUsage}/${replyQuota.dailyLimit} par jour`);
+      console.log(`[QuotaManager][INFO] Traitement des répliques annulé pour respecter les limites Bluesky`);
+      return;
+    }
+    
+    // On limite quand même le nombre de réponses par exécution pour éviter le spam
     const MAX_REPLIES_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
@@ -131,7 +142,7 @@ export async function autoReply() {
 
       // Termes liés à Silicon Valley
       'silicon valley', 'san francisco', 'bay area', 'sf tech', 'palo alto',
-      'menlo park', 'mountain view', 'sunnyvale', 'santa clara', 'cupertino',
+      'sunnyvale', 'cupertino',
 
     ];
 
@@ -159,14 +170,16 @@ export async function autoReply() {
     const myHandle = agent.session?.handle;
     console.log(`[DEBUG] Nombre de posts uniques récupérés : ${uniquePosts.length}`);
     let repliedCount = 0;
+    // Empêche de répondre plusieurs fois à la même personne dans la même exécution
+    const alreadyRepliedDIDs = new Set(Object.keys(replyHistory.users));
 
     for (const post of uniquePosts) {
       const { uri, author, record } = post;
       const text = record?.text;
 
-      // Vérifie si on a déjà répondu à cet utilisateur ou à ce post récemment
-      if (hasRepliedRecently(author.did, uri, replyHistory)) {
-        const reason = replyHistory.users[author.did] ? `déjà répondu à ${author.handle}` : 'post déjà traité';
+      // Vérifie si on a déjà répondu à cet utilisateur ou à ce post récemment (historique ou dans cette run)
+      if (alreadyRepliedDIDs.has(author.did) || hasRepliedRecently(author.did, uri, replyHistory)) {
+        const reason = replyHistory.users[author.did] || alreadyRepliedDIDs.has(author.did) ? `déjà répondu à ${author.handle}` : 'post déjà traité';
         console.log(`[IGNORÉ] Post ignoré (${reason}): uri=${uri}`);
         continue;
       }
@@ -198,6 +211,15 @@ export async function autoReply() {
         console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
         let reply = await generateReplyText(truncatedText, lang === 'fra' ? 'fr' : 'en');
         console.log(`[Réponse] Réponse générée : ${reply}`);
+        
+        // Vérification des quotas avant chaque réponse
+        const replyQuotaCheck = checkQuota('reply');
+        if (!replyQuotaCheck.allowed) {
+          console.log(`[QuotaManager][INFO] Quota de répliques atteint pendant l'exécution: ${replyQuotaCheck.hourlyUsage}/${replyQuotaCheck.hourlyLimit} par heure, ${replyQuotaCheck.dailyUsage}/${replyQuotaCheck.dailyLimit} par jour`);
+          console.log(`[INFO] Arrêt du traitement des répliques pour respecter les limites Bluesky`);
+          break;
+        }
+        
         await agent.post({
           reply: {
             root: { cid: post.cid, uri: post.uri },
@@ -205,6 +227,9 @@ export async function autoReply() {
           },
           text: reply,
         });
+        
+        // Enregistrement de l'action pour le suivi des quotas
+        recordAction('reply', post.uri, author.handle);
         repliedCount++;
         console.log(`[Succès] Répondu à ${uri}`);
         // Ajoute l'utilisateur et le post à l'historique
@@ -212,6 +237,7 @@ export async function autoReply() {
         if (!replyHistory.posts) replyHistory.posts = {};
         replyHistory.users[author.did] = Date.now();
         replyHistory.posts[uri] = Date.now();
+        alreadyRepliedDIDs.add(author.did);
         saveReplyHistory(replyHistory);
       } catch (error) {
         console.error(`[Erreur] Échec lors de la réponse à ${uri} :`, error?.response?.data || error.message);
@@ -224,6 +250,10 @@ export async function autoReply() {
     }
     console.log(`[DEBUG] Nombre total de réponses postées : ${repliedCount}`);
     console.log(`[INFO] Le bot a répondu à ${repliedCount} message(s) sur ${uniquePosts.length} posts uniques récupérés.`);
+    
+    // Affiche le statut des quotas après le traitement
+    const finalQuota = checkQuota('reply');
+    console.log(`[QuotaManager][INFO] Statut des quotas après traitement: ${finalQuota.hourlyUsage}/${finalQuota.hourlyLimit} par heure, ${finalQuota.dailyUsage}/${finalQuota.dailyLimit} par jour, ${finalQuota.hourlyRemaining} restants cette heure, ${finalQuota.dailyRemaining} restants aujourd'hui`);
   } catch (error) {
     console.error('[Erreur][autoReply] Erreur globale dans autoReply :', error?.response?.data || error.message);
   }

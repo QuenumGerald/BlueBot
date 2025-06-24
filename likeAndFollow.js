@@ -1,8 +1,10 @@
 // likeAndFollow.js
 // Like et follow automatiquement des cibles via l'agent Bluesky
+// Avec enforcement des quotas horaires et quotidiens
 
 import { agent } from './bluesky.js';
 import fs from 'fs';
+import { checkQuota, recordAction } from './quotaManager.js';
 
 const LIKE_HISTORY_FILE = './like-history.json';
 const MAX_LIKE_HISTORY_DAYS = 10;
@@ -50,6 +52,13 @@ export function delay(ms) {
 // - delayMs >= 3000 ms (3 secondes)
 // - max <= 10-15 par run si scheduler toutes les 20-30 min
 export async function likeAndFollowHashtag(hashtag = 'clippy', max = 10, delayMs = 3000) {
+  // Vérifie les quotas pour les follows (les likes sont désactivés)
+  const followQuota = checkQuota('follow');
+  if (!followQuota.allowed) {
+    console.log(`[QuotaManager][INFO] Quota de follows atteint: ${followQuota.hourlyUsage}/${followQuota.hourlyLimit} par heure, ${followQuota.dailyUsage}/${followQuota.dailyLimit} par jour`);
+    console.log(`[QuotaManager][INFO] Traitement des follows annulé pour respecter les limites Bluesky`);
+    return;
+  }
   try {
     // Recherche les derniers posts contenant le hashtag
     console.log(`[BlazeJob][INFO] Recherche des posts pour le hashtag #${hashtag} (max ${max})`);
@@ -93,8 +102,18 @@ export async function likeAndFollowHashtag(hashtag = 'clippy', max = 10, delayMs
       // Les likes sont désactivés jusqu'à nouvel ordre.
       // Follow l’auteur (besoin de DID)
       try {
-        console.log(`[BlazeJob][INFO] Tentative de follow pour l’auteur (handle: ${author.handle}, did: ${author.did})`);
+        // Vérifie à nouveau les quotas avant chaque follow (pour les actions en parallèle)
+        const followQuotaCheck = checkQuota('follow');
+        if (!followQuotaCheck.allowed) {
+          console.log(`[QuotaManager][INFO] Quota de follows atteint pendant l'exécution: ${followQuotaCheck.hourlyUsage}/${followQuotaCheck.hourlyLimit} par heure, ${followQuotaCheck.dailyUsage}/${followQuotaCheck.dailyLimit} par jour`);
+          break; // Arrête la boucle si on atteint le quota pendant le traitement
+        }
+        
+        console.log(`[BlazeJob][INFO] Tentative de follow pour l'auteur (handle: ${author.handle}, did: ${author.did})`);
         await agent.follow(author.did);
+        
+        // Enregistre l'action dans le système de quotas
+        recordAction('follow', author.did, author.handle);
         console.log(`[BlazeJob][Follow] Succès : ${author.handle}`);
       } catch (err) {
         console.error(`[BlazeJob][Follow] Échec : ${author.handle} ->`, err?.response?.data || err.message);
