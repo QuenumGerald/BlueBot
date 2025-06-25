@@ -1,46 +1,53 @@
-// generateText.js
-// Génère du texte pour Clippy (posts et replies) via DeepSeek ou OpenAI
+// --------------------------------------------------------
+// generateText.js  •  Sparky Edition  (v2 – 298‑char safety)
+// Generates funny posts & replies for the Sparky Bluesky bot
+// using DeepSeek (priority) or OpenAI (fallback)
+// ▸ Bluesky hard limit ≈ 300 char → we enforce 298 to stay safe
+// --------------------------------------------------------
 
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from 'axios'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY;
-const OPENAI_KEY = process.env.OPENAI_KEY;
+// --------------------------------------------------------
+// Provider selection ---------------------------------------------------
+// --------------------------------------------------------
+const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY
+const OPENAI_KEY = process.env.OPENAI_KEY
+const provider = DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null
+if (!provider) throw new Error('DEEPSEEK_KEY or OPENAI_KEY must be set in .env')
 
-// Choix du provider (DeepSeek prioritaire, sinon OpenAI)
-const provider = DEEPSEEK_KEY ? 'deepseek' : OPENAI_KEY ? 'openai' : null;
-if (!provider) {
-  throw new Error('DEEPSEEK_KEY ou OPENAI_KEY doit être défini dans le fichier .env');
+const API_URL = provider === 'deepseek'
+  ? 'https://api.deepseek.com/v1/chat/completions'
+  : 'https://api.openai.com/v1/chat/completions'
+
+const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo'
+
+// Global constants -----------------------------------------------------
+const MAX_POST_LEN = 280   // posts are now strictly capped at 280 chars
+const MAX_REPLY_LEN = 220  // replies can be longer but still concise
+const MAX_PUNCH_LEN = 50    // ultra‑short punchlines
+
+// Troncature intelligente (ne coupe pas un mot)
+function smartTruncate(text, maxLen) {
+  if (text.length <= maxLen) return text;
+  const truncated = text.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
 }
 
-// Paramètres API
-const deepseekApiUrl = 'https://api.deepseek.com/v1/chat/completions';
-const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
-const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo';
-
+// ---------------------------------------------------------------------
 async function callChatApi(messages, maxTokens) {
-  const url = provider === 'deepseek' ? deepseekApiUrl : openaiApiUrl;
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`,
-  };
-  const data = {
-    model,
-    messages,
-    max_tokens: maxTokens,
-    temperature: 1.5,
-  };
-  try {
-    const response = await axios.post(url, data, { headers });
-    // DeepSeek/OpenAI: .choices[0].message.content
-    return response.data.choices[0].message.content.trim();
-  } catch (error) {
-    console.error('Erreur lors de la génération de texte :', error?.response?.data || error.message);
-    throw error;
+    'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`
   }
+  const body = { model: MODEL, messages, max_tokens: maxTokens, temperature: 1.5 }
+  const { data } = await axios.post(API_URL, body, { headers })
+  return data.choices[0].message.content.trim()
 }
+
 const SYSTEM_POST = `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your posts must always be creative, original, and make people smile. In every post, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.`
 /**
  * Génère un texte pour un post mème Clippy (≤280 caractères)
@@ -135,15 +142,13 @@ export async function generatePostText() {
   // Coupe à 280 caractères max
   if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
+
 }
 
-/**
- * Generates a sophisticated Clippy response (≤200 characters)
- * @param {string} originalText - The original text to respond to
- * @param {string} lang - Language code ('en' or 'fr')
- * @returns {Promise<string>} The generated response
- */
-export async function generateReplyText(originalText, lang = 'en') {
+// ---------------------------------------------------------------------
+// REPLY GENERATOR -------------------------------------------------------
+// ---------------------------------------------------------------------
+export async function generateReplyText(originalText) {
   const messages = [
     {
       role: 'system', content: `You are Sparky, a clever, positive, and funny flame obsessed with blockchain, DeFi, and technical wordplay. Your replies must always be creative, original, and make people smile. In every reply, subtly promote the project (testnet, whitelist, liquidity, seed, etc.)—never in a cliché or boring way, and only if it fits the joke. Write in first person. Keep it under 280 characters. Absolutely no sarcasm, negativity, or emoji (never use any emoji, not even 🔥). No financial advice, no crypto clichés. If you are tempted to use an emoji, replace it with a word or metaphor instead.
@@ -164,3 +169,4 @@ Always vary your style, stay sizzling , and focus on jokes, flash loans, roastin
   if (text.length > 200) text = text.slice(0, 200);
   return text.trim();
 }
+
