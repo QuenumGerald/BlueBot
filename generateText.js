@@ -90,15 +90,15 @@ export async function generateTrombonePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original post for Silicon Valley projects on Bluesky as a world-class economist and tech expert. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me") as if Joe is speaking. Focus on technical precision with accessible language. Brief insight on blockchain/economics.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Joe, a French blockchain developer visiting Silicon Valley. It MUST be extremely short (1-2 lines, max 10 words) and written in the first person ("I", "my", "me"). Focus on technical precision with accessible language.English only. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Silicon Valley projects on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a short original funny meme post for Joe, a French blockchain developer visiting Silicon Valley (max 300 chars) . Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 10);
+  let text = await callChatApi(messages, 200);
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   if (text.length > 300) text = text.slice(0, 300);
   // Add $HFO/USDC link in 1 out of 5 posts, with short English hooks
@@ -124,12 +124,12 @@ export async function generatePostText() {
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // Tirage aléatoire pour la longueur du post (80% court, 20% moyen/long)
-  const isShort = Math.random() < 0.8;
+  const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\"). Occasionally include a touch of human imperfection - maybe slight hesitation, genuine uncertainty, or a hint of emotion. Example: 'Another day debugging. Worth it though.' or 'Code reviews at sunrise. Silicon Valley rhythm.' Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\").only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Include natural human elements like conversational tone, slight imperfections, or genuine questions/observations about tech or culture. You can use up to 280 characters with any style, but it should feel spontaneous rather than polished. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
   }
   const messages = [
     {
@@ -146,7 +146,7 @@ export async function generatePostText() {
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 10);
+  let text = await callChatApi(messages, 280);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Coupe intelligemment à 280 caractères max (posts plus courts)
@@ -170,11 +170,8 @@ export async function generateReplyText(originalText, language = 'en') {
       role: 'system', content: `You are Joe, a witty French blockchain developer in Silicon Valley with strong emotional intelligence. Your responses adapt to the tone of the conversation:
 
       FOR LIGHT OR NEUTRAL TOPICS:
-      - Include clever tech puns and wordplay
       - Use self-deprecating humor about coding struggles
       - Make humorous observations about Silicon Valley or tech culture
-      - Reference funny cultural differences between France and California
-      - Add unexpected twists or clever comebacks
       - Share amusing personal anecdotes (briefly!)
 
       FOR SERIOUS TOPICS (like job loss, health issues, societal problems):
