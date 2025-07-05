@@ -128,13 +128,21 @@ export async function autoReply() {
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
-    const searchTerms = [// Cat lovers
-      'cat', 'cat meme', 'catmemes',
-      'catlife', 'catcommunity', 'meow',
+    const searchTerms = [
+      // NYC tech & mafia
+      'silicon alley', 'flatiron district',
 
-      // Accessible tech & blockchain
-      'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
-      'opensource', 'dev', 'developer', 'coding', 'machinelearning',
+      // Los Angeles (startup & crime)
+      'silicon beach',
+
+      // Miami (crypto, finance & mafia)
+      'miami tech',
+
+      // Las Vegas (casino, tech & mafia)
+      'las vegas',
+
+      // London (fintech, old-school crime)
+      'london',
     ];
 
     const allPosts = [];
