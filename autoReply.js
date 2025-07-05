@@ -128,9 +128,8 @@ export async function autoReply() {
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts intéressants (sans hashtags)
-    const searchTerms = ['webdev', 'api',
-      'blockchain', 'crypto', 'web3', 'ethereum', 'bitcoin',
-      'opensource', 'dev', 'developer', 'coding', 'machinelearning',
+    const searchTerms = [
+      'nyc', 'new york', 'manhattan', 'new york city'
     ];
 
     const allPosts = [];

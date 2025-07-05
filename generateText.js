@@ -126,7 +126,7 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.`;
+    userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be extremely short (1 line, under 10 words) and written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. No CTA unless it’s part of the joke.Only plain text, in English. No markdown, no emojis.`;
   } else {
     userPrompt = `${randomTopic}\nWrite a new original meme post for Spark Protocol on Bluesky. Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Sparky is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
   }
@@ -139,6 +139,16 @@ export async function generatePostText() {
   let text = await callChatApi(messages, 280);
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+
+  // Supprime les guillemets parasites en début/fin
+  text = text.replace(/^"+|"+$/g, '').replace(/^'+|'+$/g, '');
+  // Supprime les retours à la ligne
+  text = text.replace(/\n+/g, ' ');
+  // Ne garde que la première phrase (finissant par . ! ou ?)
+  const match = text.match(/^[^.!?]+[.!?]/);
+  if (match) {
+    text = match[0];
+  }
   // Coupe à 280 caractères max
   if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
