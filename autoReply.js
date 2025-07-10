@@ -220,9 +220,13 @@ export async function autoReply() {
           break;
         }
         
+        const rootRef = record?.reply?.root
+          ? { cid: record.reply.root.cid, uri: record.reply.root.uri }
+          : { cid: post.cid, uri: post.uri };
+
         await agent.post({
           reply: {
-            root: { cid: post.cid, uri: post.uri },
+            root: rootRef,
             parent: { cid: post.cid, uri: post.uri }
           },
           text: reply,
