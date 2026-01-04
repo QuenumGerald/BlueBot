@@ -23,9 +23,9 @@ function nextHour(hour) {
 function inMinutes(minutes) {
   return new Date(Date.now() + minutes * 60 * 1000);
 }
-console.log('=== BlueBot Scheduler started! (Render log test) ===');
+console.log('=== Alkimo Bot Scheduler started! ===');
 // Initialise la base de données locale pour stocker l'état des jobs
-const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
+const jobs = new BlazeJob({ dbPath: './alkimo-jobs.db' });
 
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -34,17 +34,17 @@ const postTextHours = [9, 13, 17, 21, 22, 23]; // 3 posts texte par jour
 for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
-      console.log(`[BlazeJob] [START] Job texte Clippy ${hour}h`);
+      console.log(`[BlazeJob] [START] Job texte Alkimo ${hour}h`);
       await initBluesky();
       const text = await generateTrombonePostText();
       await agent.post({ text });
       console.log(`[BlazeJob][PostTexte] Texte posté à ${hour}h :`, text);
-      console.log(`[BlazeJob] [END] Job texte Clippy ${hour}h`);
+      console.log(`[BlazeJob] [END] Job texte Alkimo ${hour}h`);
     } catch (err) {
-      console.error(`[BlazeJob][ERROR] Job texte Clippy ${hour}h :`, err);
+      console.error(`[BlazeJob][ERROR] Job texte Alkimo ${hour}h :`, err);
     }
   }, {
-    name: `Trombone Text Post ${hour}h`,
+    name: `Alkimo Text Post ${hour}h`,
     runAt: isTest ? inMinutes(15) : nextHour(hour),
     interval: 24 * 60 * 60 * 1000,
     maxRuns: 3650,
@@ -54,11 +54,12 @@ for (const hour of postTextHours) {
 
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const projectCollabHashtags =
-  [ // Blockchain & Web3
-    // Open-source & Collaboration
-    // Silicon Valley
-    'siliconvalley', 'sanfrancisco', 'bayarea', 'startups', 'techcommunity',
-    // Tech skills
+  [ // Tech Africa & AI
+    'techafrica', 'africatech', 'startupafrica', 'iaafrique', 'digitalafrica',
+    // Mobile Money & Fintech
+    'fintechafrica', 'africastartups',
+    // Countries/Regions
+    'benintech', 'senegaltech', 'civtech', 'nigeriatech', 'kenyatech'
   ];
 
 // Configuration spéciale pour les contributions et le networking à Silicon Valley (15 juillet - 2 septembre 2025)
@@ -97,7 +98,7 @@ for (const hour of likeFollowHours) {
       console.error(`[BlazeJob][ERROR] Job like/follow ${hour}h :`, err);
     }
   }, {
-    name: `Buyer Like & Follow ${hour}h`,
+    name: `Alkimo Like & Follow ${hour}h`,
     runAt: isTest ? inMinutes(3) : nextHour(hour),
     interval: isTest ? 5 * 60 * 1000 : 24 * 60 * 60 * 1000, // toutes les 5 min en test
     maxRuns: 3650,

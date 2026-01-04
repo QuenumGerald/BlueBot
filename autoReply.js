@@ -124,7 +124,7 @@ export async function autoReply() {
     // Limite recommandée Bluesky :
     // - Pas plus de 100-200 replies/jour
     // - Implémenté via quotaManager (25 replies/heure, 100 replies/jour)
-    
+
     // Vérification des quotas de réponses
     const replyQuota = checkQuota('reply');
     if (!replyQuota.allowed) {
@@ -132,18 +132,17 @@ export async function autoReply() {
       console.log(`[QuotaManager][INFO] Traitement des répliques annulé pour respecter les limites Bluesky`);
       return;
     }
-    
+
     // On limite quand même le nombre de réponses par exécution pour éviter le spam
     const MAX_REPLIES_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts pertinents pour la recherche d'emploi
     const searchTerms = [
-
-      // Termes liés à Silicon Valley
-      'silicon valley', 'san francisco', 'bay area', 'sf tech', 'palo alto',
-      'sunnyvale', 'cupertino',
-
+      'AI Africa', 'Tech Africa', 'Digital Africa', 'Startup Africa',
+      'Alkimo',
+      'Lagos tech', 'Abuja tech', 'Accra tech', 'Nairobi tech',
+      'Johannesburg tech', 'Casablanca tech', 'Dakar tech', 'Abidjan tech'
     ];
 
     // Récupère les posts récents contenant les termes de recherche
@@ -211,7 +210,7 @@ export async function autoReply() {
         console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
         let reply = await generateReplyText(truncatedText, lang === 'fra' ? 'fr' : 'en');
         console.log(`[Réponse] Réponse générée : ${reply}`);
-        
+
         // Vérification des quotas avant chaque réponse
         const replyQuotaCheck = checkQuota('reply');
         if (!replyQuotaCheck.allowed) {
@@ -219,7 +218,7 @@ export async function autoReply() {
           console.log(`[INFO] Arrêt du traitement des répliques pour respecter les limites Bluesky`);
           break;
         }
-        
+
         const rootRef = record?.reply?.root
           ? { cid: record.reply.root.cid, uri: record.reply.root.uri }
           : { cid: post.cid, uri: post.uri };
@@ -231,7 +230,7 @@ export async function autoReply() {
           },
           text: reply,
         });
-        
+
         // Enregistrement de l'action pour le suivi des quotas
         recordAction('reply', post.uri, author.handle);
         repliedCount++;
@@ -254,7 +253,7 @@ export async function autoReply() {
     }
     console.log(`[DEBUG] Nombre total de réponses postées : ${repliedCount}`);
     console.log(`[INFO] Le bot a répondu à ${repliedCount} message(s) sur ${uniquePosts.length} posts uniques récupérés.`);
-    
+
     // Affiche le statut des quotas après le traitement
     const finalQuota = checkQuota('reply');
     console.log(`[QuotaManager][INFO] Statut des quotas après traitement: ${finalQuota.hourlyUsage}/${finalQuota.hourlyLimit} par heure, ${finalQuota.dailyUsage}/${finalQuota.dailyLimit} par jour, ${finalQuota.hourlyRemaining} restants cette heure, ${finalQuota.dailyRemaining} restants aujourd'hui`);

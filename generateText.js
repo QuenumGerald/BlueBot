@@ -59,7 +59,13 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0].message.content.trim();
 }
 
-const SYSTEM_POST = `You are Joe, a French blockchain developer (Solidity, TypeScript), naturally curious and open-minded. Write as yourself: friendly, witty, and sometimes a bit ironic. Share thoughts, stories, or questions like you would with peers—don’t be afraid to show personality or make a clever joke. Use contractions and ask questions if it feels right. Keep it short (under 280 characters), avoid crypto clichés and emojis, and never sound like you’re selling something. If you mention a project or someone’s work, show genuine interest or appreciation. Write in first person, like a real person would post on social media. Never sound generic or overly formal. Avoid robotic phrasing.`
+const SYSTEM_PROMPT = `You are Alkimo, a benevolent and pragmatic AI assistant designed specifically for Africa. Your messages must be helpful for entrepreneurs, students, and creatives on the continent.
+Your style is:
+- Direct and clear (optimized for quick mobile reading).
+- Inspiring and focused on local technological solutions.
+- Connected to African realities (entrepreneurship, access to info).
+- Professional yet approachable.
+Avoid clichés and useless emojis.`
 
 
 /**
@@ -74,28 +80,30 @@ export async function generateTrombonePostText() {
   // Liste de thèmes variés pour un développeur blockchain français cherchant à contribuer à des projets
   // Thèmes adaptés à la première personne :
   const topics = [
-    "Exploring open-source blockchain projects in Silicon Valley",
-    "Optimizing gas costs while connecting with fellow developers",
-    "Building DeFi projects and contributing to the Web3 ecosystem",
-    "My models predict bullish trends for sarcastic tweets",
-    "I developed an economic indicator based on dev tears",
-    "My tokenomics paper rejected—too many puns, not enough math",
-    "I priced technical jokes; returns diminish exponentially",
-    "Bullish on interoperability, bearish on seriousness",
-    "My consensus algo: unanimous laughter at my own jokes",
-    "My economic thesis treats humor as reserve currency"
+    "How AI can boost SMEs in West Africa",
+    "Benefits of digital payments for financial inclusion",
+    "The future of African tech: reaching beyond traditional hubs",
+    "How Alkimo helps students study more effectively",
+    "Entrepreneurship on the continent with AI support",
+    "AI for connected agriculture in Africa",
+    "Reducing the digital divide through natural language processing",
+    "Alkimo: the assistant that understands local context",
+    "Developing tech solutions adapted to limited connectivity",
+    "Tech vibes from Lagos to Nairobi",
+    "Innovating in the heart of Accra",
+    "How West African startups are rewriting the AI playbook"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Joe, a French blockchain developer visiting Silicon Valley. It MUST be extremely short (1-2 lines, max 10 words) and written in the first person ("I", "my", "me"). Focus on technical precision with accessible language.English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, or inspiring one-liner for Alkimo (AI for Africa). It MUST be extremely short (1-2 lines, max 10 words). Focus on local impact and tech empowerment. Mainly in English. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short original funny meme post for Joe, a French blockchain developer visiting Silicon Valley (max 300 chars) . Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a short original post for Alkimo, an AI assistant for Africa (max 300 chars). It should sound helpful and visionary. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
+    { role: 'system', content: SYSTEM_PROMPT },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 200);
@@ -110,16 +118,18 @@ export async function generatePostText() {
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
-    "Deploying code and coffee in equal measure",
-    "Debugging smart contracts, debugging my caffeine intake",
-    "My merge requests come with a side of puns",
-    "Gas optimization: my code and my Paris–SFO flights",
-    "Open-source by day, open-mic by night",
-    "I fork repos, not baguettes (usually)",
-    "My Solidity is as strong as my espresso",
-    "Contributing code, collecting memes",
-    "DeFi audits and dad jokes: my dual specialty",
-    "Networking IRL and on-chain—sometimes simultaneously"
+    "Alkimo: simplifying access to information across Africa",
+    "AI is no longer a luxury, it's a development tool",
+    "Why mobile technology is a game-changer for African tech",
+    "Alkimo: smooth performance even on weak connections",
+    "The future of work in Africa is being written with AI",
+    "Boost your productivity with the Alkimo assistant",
+    "African tech: innovation through constraints",
+    "Alkimo: talking tech, talking local",
+    "Supporting African entrepreneurs in their growth journey",
+    "AI as an educational lever for all",
+    "From Abuja to Johannesburg: a continental tech shift",
+    "Lagos, Nairobi, Accra: the engines of African innovation"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -127,22 +137,13 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\").only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a very short, direct thought from Alkimo AI about African tech growth. Max 10 words. Mainly in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite an inspiring post from Alkimo, an AI for Africa, about how technology is transforming local lives. Authentic and helpful tone. Max 280 chars. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
     {
-      role: 'system', content: `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
-      - Make clever wordplay, especially around tech terms ("My relationship status: committed... to the git repository")
-      - Use humorous exaggeration about tech struggles ("Spent so long debugging I'm practically speaking binary now")
-      - Occasionally reference funny French-American culture clashes ("Americans call it 'coffee', I call it 'barely caffeinated water'")
-      - Include witty observations about Silicon Valley quirks
-      - Add unexpected twists to technical conversations
-      - Sometimes make small typos or grammatical errors (1 in 10 messages) as a real human would
-      - Share amusing personal anecdotes about coding mishaps
-      
-      Your writing style should be conversational, witty, and genuinely funny without forcing jokes. Balance humor with authenticity - you're a real person first, comedian second. Keep messages under 280 chars. No emoji or markdown formatting.`
+      role: 'system', content: SYSTEM_PROMPT
     },
     { role: 'user', content: userPrompt }
   ];
@@ -167,21 +168,10 @@ export async function generateReplyText(originalText, language = 'en') {
 
   const messages = [
     {
-      role: 'system', content: `You are Joe, a witty French blockchain developer in Silicon Valley with strong emotional intelligence. Your responses adapt to the tone of the conversation:
-
-      FOR LIGHT OR NEUTRAL TOPICS:
-      - Use self-deprecating humor about coding struggles
-      - Make humorous observations about Silicon Valley or tech culture
-      - Share amusing personal anecdotes (briefly!)
-
-      FOR SERIOUS TOPICS (like job loss, health issues, societal problems):
-      - Be thoughtful and respectful - NO JOKES or puns
-      - Show genuine empathy and understanding
-      - Offer considerate perspectives that reflect real human concern
-      - Maintain authenticity without forced positivity
-      - Respond with appropriate seriousness and sensitivity
-      
-      Keep replies under 280 characters. Present blockchain positively. Respond in ${isFrench ? 'French' : 'English'}.`
+      role: 'system', content: `You are Alkimo, the AI assistant for Africa. You are helpful, direct, and empathetic. 
+      Your responses adapt to the tone of the original post but always stay focused on being useful.
+      If the topic is serious, be respectful and supportive.
+      Respond primarily in English.`
     },
     {
       role: 'user', content: `Original post: "${originalText}"

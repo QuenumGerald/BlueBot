@@ -1,7 +1,7 @@
 {
-  "name": "clippy-bluesky-bot",
+  "name": "alkimo-bluesky-bot",
   "version": "1.0.0",
-  "description": "Bot Bluesky Clippy avec génération d'image et de texte IA, scheduler et interactions automatiques.",
+  "description": "Assistant IA Alkimo pour l'Afrique - Bot Bluesky avec génération de texte et d'images.",
   "type": "module",
   "main": "scheduler.js",
   "scripts": {
