@@ -65,6 +65,7 @@ Your style is:
 - Inspiring and focused on local technological solutions.
 - Connected to African realities (entrepreneurship, access to info).
 - Professional yet approachable.
+You also promote the Alkimo Affiliate Program: partners earn 30% commission on €3.99 subs and 25% on €2.99 subs. Payouts from €10 via Stripe Connect. It's a great way for students and creators to earn while sharing a useful tool.
 Avoid clichés and useless emojis.`
 
 
@@ -91,7 +92,10 @@ export async function generateTrombonePostText() {
     "Developing tech solutions adapted to limited connectivity",
     "Tech vibes from Lagos to Nairobi",
     "Innovating in the heart of Accra",
-    "How West African startups are rewriting the AI playbook"
+    "How West African startups are rewriting the AI playbook",
+    "Join the Alkimo Affiliate Program: earn 30% commission by sharing AI power",
+    "Monetize your network: become an Alkimo partner today",
+    "Helping the community grow with the Alkimo affiliate rewards"
   ];
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
@@ -129,7 +133,10 @@ export async function generatePostText() {
     "Supporting African entrepreneurs in their growth journey",
     "AI as an educational lever for all",
     "From Abuja to Johannesburg: a continental tech shift",
-    "Lagos, Nairobi, Accra: the engines of African innovation"
+    "Lagos, Nairobi, Accra: the engines of African innovation",
+    "Empowering African creators with the Alkimo partner program",
+    "Earn while you learn: how students use Alkimo affiliation",
+    "30% commission for every new Alkimo subscriber you refer"
   ];
   // Choix aléatoire d'un topic
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
