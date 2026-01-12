@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { generateTrombonePostText } from './generateText.js';
 import { likeAndFollowHashtag } from './likeAndFollow.js';
 import { agent, initBluesky } from './bluesky.js';
+import { autoReply, autoSmallReply } from './autoReply.js';
 
 dotenv.config(); // Charge les variables d'environnement depuis .env
 
@@ -69,7 +70,6 @@ const maxPerJob = 3; // 3 posts/hashtag/jobœ pour +50%
 const delayMs = 3000; // délai inchangé
 
 // Planification auto-reply pour la recherche d'emploi (réponse aux opportunités)
-import { autoReply } from './autoReply.js';
 for (const hour of replyHours) {
   jobs.schedule(async () => {
     try {
@@ -83,6 +83,25 @@ for (const hour of replyHours) {
     name: `AutoReply ${hour}h`,
     runAt: isTest ? inMinutes(1) : nextHour(hour),
     interval: isTest ? 5 * 60 * 1000 : 12 * 60 * 60 * 1000, // toutes les 5 min en test
+    maxRuns: 3650,
+  });
+}
+
+// Planification de quelques replies (max 2) pour maintenir l'interaction sans spam
+const smallReplyHours = [9, 19];
+for (const hour of smallReplyHours) {
+  jobs.schedule(async () => {
+    try {
+      console.log(`[BlazeJob] [START] Job autoSmallReply ${hour}h`);
+      await autoSmallReply();
+      console.log(`[BlazeJob] [END] Job autoSmallReply ${hour}h`);
+    } catch (err) {
+      console.error(`[BlazeJob][ERROR] Job autoSmallReply ${hour}h :`, err);
+    }
+  }, {
+    name: `AutoSmallReply ${hour}h`,
+    runAt: isTest ? inMinutes(2) : nextHour(hour),
+    interval: isTest ? 10 * 60 * 1000 : 24 * 60 * 60 * 1000, // toutes les 10 min en test
     maxRuns: 3650,
   });
 }

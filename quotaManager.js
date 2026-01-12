@@ -15,7 +15,7 @@ const LIMITS = {
   },
   follow: {
     hourly: 30,
-    daily: 200, 
+    daily: 200,
     historyFile: './analytics/follow-history.json',
     historyDays: 30, // Garder l'historique des follows sur 30 jours
   },
@@ -24,6 +24,12 @@ const LIMITS = {
     daily: 100, // Plus prudent que la limite max de 200
     historyFile: './analytics/reply-history.json',
     historyDays: 30, // Garder l'historique des replies sur 30 jours
+  },
+  repost: {
+    hourly: 25,
+    daily: 100,
+    historyFile: './analytics/repost-history.json',
+    historyDays: 30,
   }
 };
 
@@ -78,9 +84,9 @@ function saveHistory(actionType, history) {
     // Nettoie les actions trop anciennes
     const now = Date.now();
     const maxAge = LIMITS[actionType].historyDays * 24 * 60 * 60 * 1000;
-    
+
     // Filtre pour garder uniquement les actions récentes
-    history.actions = history.actions.filter(action => 
+    history.actions = history.actions.filter(action =>
       now - action.timestamp <= maxAge
     );
 
@@ -196,10 +202,10 @@ export function generateDailyReport(actionType, days = 7) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
-      
+
       const nextDate = new Date(date);
       nextDate.setDate(nextDate.getDate() + 1);
-      
+
       // Compte les actions pour ce jour
       const dayActions = history.actions.filter(action => {
         const actionTime = new Date(action.timestamp);
@@ -225,11 +231,11 @@ export function generateDailyReport(actionType, days = 7) {
  */
 export function getQuotaSummary() {
   const summary = {};
-  
+
   for (const actionType of Object.keys(LIMITS)) {
     summary[actionType] = checkQuota(actionType);
   }
-  
+
   return summary;
 }
 
@@ -238,13 +244,13 @@ export function getQuotaSummary() {
  */
 export function printFullReport() {
   console.log('\n===== RAPPORT D\'UTILISATION BLUEBOT =====');
-  
+
   for (const actionType of Object.keys(LIMITS)) {
     const quota = checkQuota(actionType);
     console.log(`\n== ${actionType.toUpperCase()} ==`);
     console.log(`Aujourd'hui: ${quota.dailyUsage}/${quota.dailyLimit} (${quota.dailyRemaining} restants)`);
     console.log(`Dernière heure: ${quota.hourlyUsage}/${quota.hourlyLimit} (${quota.hourlyRemaining} restants)`);
-    
+
     // Ajoute le rapport des 7 derniers jours
     const report = generateDailyReport(actionType, 7);
     console.log('\nHistorique 7 jours:');
@@ -252,6 +258,6 @@ export function printFullReport() {
       console.log(`${day.date}: ${day.count}`);
     });
   }
-  
+
   console.log('\n=======================================');
 }

@@ -90,11 +90,94 @@ function saveReplyHistory(history) {
 }
 
 /**
- * Vérifie si on a déjà répondu à un utilisateur ou à un post spécifique
+ * Petit job séparé : envoie quelques réponses (max 2) pour maintenir l'interaction
+ */
+export async function autoSmallReply() {
+  try {
+    const replyHistory = loadReplyHistory();
+    const MAX_REPLIES_PER_RUN = 2;
+    const searchTerms = [
+      'AI Africa', 'Tech Africa', 'Digital Africa', 'Startup Africa',
+      'Alkimo',
+      'Lagos tech', 'Abuja tech', 'Accra tech', 'Nairobi tech',
+      'Johannesburg tech', 'Casablanca tech', 'Dakar tech', 'Abidjan tech'
+    ];
+
+    // Vérifie le quota reply avant d'initialiser
+    const quotaCheck = checkQuota('reply');
+    if (!quotaCheck.allowed) {
+      console.log(`[QuotaManager][INFO] Quota de replies déjà atteint: ${quotaCheck.hourlyUsage}/${quotaCheck.hourlyLimit} par heure, ${quotaCheck.dailyUsage}/${quotaCheck.dailyLimit} par jour`);
+      return;
+    }
+
+    await initBluesky();
+    const uniquePosts = await fetchSearchPosts(searchTerms);
+    uniquePosts.sort(() => Math.random() - 0.5);
+    if (uniquePosts.length === 0) {
+      console.warn('[INFO] Aucun post trouvé pour les hashtags ciblés (small reply).');
+      return;
+    }
+    const alreadyRepliedDIDs = new Set(Object.keys(replyHistory.users));
+    let replyCount = 0;
+
+    for (const post of uniquePosts) {
+      if (replyCount >= MAX_REPLIES_PER_RUN) break;
+      const { uri, cid, author, record } = post;
+      const text = record?.text;
+
+      if (alreadyRepliedDIDs.has(author.did) || hasRepliedRecently(author.did, uri, replyHistory)) {
+        continue;
+      }
+
+      let lang = 'undefined';
+      if (text) lang = franc(text, { minLength: 10 });
+      if (lang !== 'fra' && lang !== 'eng' && lang !== 'und') {
+        continue;
+      }
+
+      // Vérification quota à chaque réponse
+      const perReplyQuota = checkQuota('reply');
+      if (!perReplyQuota.allowed) {
+        console.log(`[QuotaManager][INFO] Quota de replies atteint en cours d'exécution: ${perReplyQuota.hourlyUsage}/${perReplyQuota.hourlyLimit} par heure, ${perReplyQuota.dailyUsage}/${perReplyQuota.dailyLimit} par jour`);
+        break;
+      }
+
+      const truncatedText = truncateForReply(text);
+      const replyText = await generateReplyText(truncatedText, lang === 'fra' ? 'fr' : 'en');
+
+      const rootRef = record?.reply?.root
+        ? { cid: record.reply.root.cid, uri: record.reply.root.uri }
+        : { cid, uri };
+
+      await agent.post({
+        reply: {
+          root: rootRef,
+          parent: { cid, uri }
+        },
+        text: replyText,
+      });
+
+      recordAction('reply', uri, author.handle);
+      replyHistory.users[author.did] = Date.now();
+      replyHistory.posts[uri] = Date.now();
+      alreadyRepliedDIDs.add(author.did);
+      saveReplyHistory(replyHistory);
+      replyCount++;
+      console.log(`[Succès] Reply envoyée sur ${uri}`);
+      await delay(8000);
+    }
+    console.log(`[INFO] autoSmallReply terminé avec ${replyCount} réponses.`);
+  } catch (error) {
+    console.error('[Erreur][autoSmallReply] Erreur globale :', error?.response?.data || error.message);
+  }
+}
+
+/**
+ * Vérifie si on a déjà répondu/reposté un utilisateur ou un post spécifique
  * @param {string} did DID de l'utilisateur à vérifier
  * @param {string} uri URI du post à vérifier
  * @param {Object} history Historique des réponses
- * @returns {boolean} true si on a déjà répondu récemment à cet utilisateur ou à ce post
+ * @returns {boolean} true si on a déjà répondu/reposté récemment cet utilisateur ou ce post
  */
 function hasRepliedRecently(did, uri, history) {
   // Vérifie si on a déjà répondu à cet utilisateur récemment
@@ -110,8 +193,31 @@ function hasRepliedRecently(did, uri, history) {
   return false;
 }
 
+async function fetchSearchPosts(searchTerms) {
+  const allPosts = [];
+  for (const term of searchTerms) {
+    console.log(`[Recherche] Récupération des 10 derniers posts contenant "${term}"`);
+    const res = await agent.app.bsky.feed.searchPosts({ q: term, limit: 10 });
+    if (res && Array.isArray(res.data.posts)) {
+      allPosts.push(...res.data.posts);
+    }
+    await delay(500);
+  }
+  return Array.from(new Map(allPosts.map(p => [p.uri, p])).values());
+}
+
+function truncateForReply(text) {
+  const MAX_INPUT_LENGTH = 500;
+  if (!text || text.length <= MAX_INPUT_LENGTH) return text;
+  const window = text.substring(0, MAX_INPUT_LENGTH);
+  const lastSentence = window.lastIndexOf('.');
+  if (lastSentence > MAX_INPUT_LENGTH * 0.5) return window.substring(0, lastSentence + 1) + ' [...]';
+  const lastSpace = window.lastIndexOf(' ');
+  return window.substring(0, Math.max(lastSpace, 0)) + ' [...]';
+}
+
 /**
- * Recherche les 10 derniers posts #CLIPPY et y répond de façon IA
+ * Recherche les posts et les repost au lieu de répondre
  */
 export async function autoReply() {
   try {
@@ -122,19 +228,19 @@ export async function autoReply() {
     // Limite différente selon le mode (test ou production)
     const isTest = process.env.NODE_ENV === 'test';
     // Limite recommandée Bluesky :
-    // - Pas plus de 100-200 replies/jour
-    // - Implémenté via quotaManager (25 replies/heure, 100 replies/jour)
+    // - Pas plus de 100-200 actions/jour
+    // - Implémenté via quotaManager (25 reposts/heure, 100 reposts/jour)
 
-    // Vérification des quotas de réponses
-    const replyQuota = checkQuota('reply');
-    if (!replyQuota.allowed) {
-      console.log(`[QuotaManager][INFO] Quota de répliques atteint: ${replyQuota.hourlyUsage}/${replyQuota.hourlyLimit} par heure, ${replyQuota.dailyUsage}/${replyQuota.dailyLimit} par jour`);
-      console.log(`[QuotaManager][INFO] Traitement des répliques annulé pour respecter les limites Bluesky`);
+    // Vérification des quotas de reposts
+    const repostQuota = checkQuota('repost');
+    if (!repostQuota.allowed) {
+      console.log(`[QuotaManager][INFO] Quota de reposts atteint: ${repostQuota.hourlyUsage}/${repostQuota.hourlyLimit} par heure, ${repostQuota.dailyUsage}/${repostQuota.dailyLimit} par jour`);
+      console.log(`[QuotaManager][INFO] Traitement des reposts annulé pour respecter les limites Bluesky`);
       return;
     }
 
-    // On limite quand même le nombre de réponses par exécution pour éviter le spam
-    const MAX_REPLIES_PER_RUN = 5; // Limite raisonnable pour éviter le spam
+    // On limite quand même le nombre de reposts par exécution pour éviter le spam
+    const MAX_ACTIONS_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
     // Termes de recherche pour trouver des posts pertinents pour la recherche d'emploi
@@ -146,19 +252,7 @@ export async function autoReply() {
     ];
 
     // Récupère les posts récents contenant les termes de recherche
-    const allPosts = [];
-    for (const term of searchTerms) {
-      console.log(`[Recherche] Récupération des 10 derniers posts contenant "${term}"`);
-      // Recherche par terme (hashtag ou mots-clés)
-      const res = await agent.app.bsky.feed.searchPosts({ q: term, limit: 10 });
-      if (res && Array.isArray(res.data.posts)) {
-        allPosts.push(...res.data.posts);
-      }
-      // Petit délai entre les requêtes pour éviter le rate limiting
-      await delay(500);
-    }
-    // Supprime les doublons de posts (par uri)
-    const uniquePosts = Array.from(new Map(allPosts.map(p => [p.uri, p])).values());
+    const uniquePosts = await fetchSearchPosts(searchTerms);
     // Mélange aléatoire pour répondre à des posts variés à chaque run
     uniquePosts.sort(() => Math.random() - 0.5);
     if (uniquePosts.length === 0) {
@@ -168,15 +262,15 @@ export async function autoReply() {
     // Récupère le handle du bot pour ne pas répondre à soi-même
     const myHandle = agent.session?.handle;
     console.log(`[DEBUG] Nombre de posts uniques récupérés : ${uniquePosts.length}`);
-    let repliedCount = 0;
-    // Empêche de répondre plusieurs fois à la même personne dans la même exécution
+    let actionCount = 0;
+    // Empêche de repost plusieurs fois à la même personne dans la même exécution
     const alreadyRepliedDIDs = new Set(Object.keys(replyHistory.users));
 
     for (const post of uniquePosts) {
       const { uri, author, record } = post;
       const text = record?.text;
 
-      // Vérifie si on a déjà répondu à cet utilisateur ou à ce post récemment (historique ou dans cette run)
+      // Vérifie si on a déjà reposté cet utilisateur ou ce post récemment (historique ou dans cette run)
       if (alreadyRepliedDIDs.has(author.did) || hasRepliedRecently(author.did, uri, replyHistory)) {
         const reason = replyHistory.users[author.did] || alreadyRepliedDIDs.has(author.did) ? `déjà répondu à ${author.handle}` : 'post déjà traité';
         console.log(`[IGNORÉ] Post ignoré (${reason}): uri=${uri}`);
@@ -193,48 +287,20 @@ export async function autoReply() {
         continue; // NE PAS incrémenter repliedCount
       }
       try {
-        // Tronque intelligemment les textes trop longs pour l'API
-        const MAX_INPUT_LENGTH = 500; // Longueur maximale raisonnable pour l'entrée
-        let truncatedText = text;
-
-        if (text && text.length > MAX_INPUT_LENGTH) {
-          // Coupe à la dernière phrase complète avant la limite
-          const lastSentenceBreak = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf('.');
-          if (lastSentenceBreak > MAX_INPUT_LENGTH * 0.5) { // Si on a au moins la moitié du texte
-            truncatedText = text.substring(0, lastSentenceBreak + 1) + ' [...]';
-          } else {
-            // Sinon coupe au dernier espace pour ne pas couper un mot
-            const lastSpace = text.substring(0, MAX_INPUT_LENGTH).lastIndexOf(' ');
-          }
-        }
-        console.log(`[Réponse] Génération d'une réponse à : ${truncatedText}`);
-        let reply = await generateReplyText(truncatedText, lang === 'fra' ? 'fr' : 'en');
-        console.log(`[Réponse] Réponse générée : ${reply}`);
-
-        // Vérification des quotas avant chaque réponse
-        const replyQuotaCheck = checkQuota('reply');
-        if (!replyQuotaCheck.allowed) {
-          console.log(`[QuotaManager][INFO] Quota de répliques atteint pendant l'exécution: ${replyQuotaCheck.hourlyUsage}/${replyQuotaCheck.hourlyLimit} par heure, ${replyQuotaCheck.dailyUsage}/${replyQuotaCheck.dailyLimit} par jour`);
-          console.log(`[INFO] Arrêt du traitement des répliques pour respecter les limites Bluesky`);
+        // Vérification des quotas avant chaque repost
+        const repostQuotaCheck = checkQuota('repost');
+        if (!repostQuotaCheck.allowed) {
+          console.log(`[QuotaManager][INFO] Quota de reposts atteint pendant l'exécution: ${repostQuotaCheck.hourlyUsage}/${repostQuotaCheck.hourlyLimit} par heure, ${repostQuotaCheck.dailyUsage}/${repostQuotaCheck.dailyLimit} par jour`);
+          console.log(`[INFO] Arrêt du traitement des reposts pour respecter les limites Bluesky`);
           break;
         }
 
-        const rootRef = record?.reply?.root
-          ? { cid: record.reply.root.cid, uri: record.reply.root.uri }
-          : { cid: post.cid, uri: post.uri };
-
-        await agent.post({
-          reply: {
-            root: rootRef,
-            parent: { cid: post.cid, uri: post.uri }
-          },
-          text: reply,
-        });
+        await agent.repost(post.uri, post.cid);
 
         // Enregistrement de l'action pour le suivi des quotas
-        recordAction('reply', post.uri, author.handle);
-        repliedCount++;
-        console.log(`[Succès] Répondu à ${uri}`);
+        recordAction('repost', post.uri, author.handle);
+        actionCount++;
+        console.log(`[Succès] Repost de ${uri}`);
         // Ajoute l'utilisateur et le post à l'historique
         if (!replyHistory.users) replyHistory.users = {};
         if (!replyHistory.posts) replyHistory.posts = {};
@@ -243,19 +309,19 @@ export async function autoReply() {
         alreadyRepliedDIDs.add(author.did);
         saveReplyHistory(replyHistory);
       } catch (error) {
-        console.error(`[Erreur] Échec lors de la réponse à ${uri} :`, error?.response?.data || error.message);
+        console.error(`[Erreur] Échec lors du repost de ${uri} :`, error?.response?.data || error.message);
       }
       await delay(10000);
-      if (repliedCount >= MAX_REPLIES_PER_RUN) {
-        console.log(`[INFO] Limite de ${MAX_REPLIES_PER_RUN} réponses atteinte, arrêt de la boucle.`);
+      if (actionCount >= MAX_ACTIONS_PER_RUN) {
+        console.log(`[INFO] Limite de ${MAX_ACTIONS_PER_RUN} reposts atteinte, arrêt de la boucle.`);
         break;
       }
     }
-    console.log(`[DEBUG] Nombre total de réponses postées : ${repliedCount}`);
-    console.log(`[INFO] Le bot a répondu à ${repliedCount} message(s) sur ${uniquePosts.length} posts uniques récupérés.`);
+    console.log(`[DEBUG] Nombre total de reposts effectués : ${actionCount}`);
+    console.log(`[INFO] Le bot a reposté ${actionCount} message(s) sur ${uniquePosts.length} posts uniques récupérés.`);
 
     // Affiche le statut des quotas après le traitement
-    const finalQuota = checkQuota('reply');
+    const finalQuota = checkQuota('repost');
     console.log(`[QuotaManager][INFO] Statut des quotas après traitement: ${finalQuota.hourlyUsage}/${finalQuota.hourlyLimit} par heure, ${finalQuota.dailyUsage}/${finalQuota.dailyLimit} par jour, ${finalQuota.hourlyRemaining} restants cette heure, ${finalQuota.dailyRemaining} restants aujourd'hui`);
   } catch (error) {
     console.error('[Erreur][autoReply] Erreur globale dans autoReply :', error?.response?.data || error.message);
