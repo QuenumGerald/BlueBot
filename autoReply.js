@@ -17,25 +17,25 @@ const SEARCH_TERMS = [
   // IA générale
   'AI', 'artificial intelligence', 'machine learning', 'deep learning', 'LLM',
   'gen AI', 'foundation models', 'computer vision', 'NLP', 'AI agents',
-  // Asie du Sud et Asie du Sud-Est
-  'India tech', 'Bangalore AI', 'Hyderabad AI', 'Delhi AI',
-  'Pakistan tech', 'Karachi AI', 'Lahore AI',
-  'Bangladesh tech', 'Dhaka AI',
-  'Vietnam tech', 'Hanoi AI', 'Ho Chi Minh AI',
-  'Indonesia tech', 'Jakarta AI',
-  'Philippines tech', 'Manila AI',
-  // Amérique Latine
-  'Brazil tech', 'São Paulo AI', 'Rio AI',
-  'Mexico tech', 'CDMX AI',
-  'Argentina tech', 'Buenos Aires AI',
-  'Colombia tech', 'Bogota AI',
-  'Peru tech', 'Lima AI',
-  // Afrique (pays en développement)
-  'Kenya AI', 'Nairobi AI',
-  'Nigeria AI', 'Lagos AI', 'Abuja AI',
-  'Ghana AI', 'Accra AI',
-  'Ethiopia AI', 'Addis Ababa AI',
-  'South Africa AI', 'Johannesburg AI',
+  /*   // Asie du Sud et Asie du Sud-Est
+    'India tech', 'Bangalore AI', 'Hyderabad AI', 'Delhi AI',
+    'Pakistan tech', 'Karachi AI', 'Lahore AI',
+    'Bangladesh tech', 'Dhaka AI',
+    'Vietnam tech', 'Hanoi AI', 'Ho Chi Minh AI',
+    'Indonesia tech', 'Jakarta AI',
+    'Philippines tech', 'Manila AI',
+    // Amérique Latine
+    'Brazil tech', 'São Paulo AI', 'Rio AI',
+    'Mexico tech', 'CDMX AI',
+    'Argentina tech', 'Buenos Aires AI',
+    'Colombia tech', 'Bogota AI',
+    'Peru tech', 'Lima AI',
+    // Afrique (pays en développement)
+    'Kenya AI', 'Nairobi AI',
+    'Nigeria AI', 'Lagos AI', 'Abuja AI',
+    'Ghana AI', 'Accra AI',
+    'Ethiopia AI', 'Addis Ababa AI',
+    'South Africa AI', 'Johannesburg AI', */
 ];
 
 // Gestion de l'historique des utilisateurs déjà contactés
