@@ -123,10 +123,8 @@ export async function autoSmallReply() {
     const replyHistory = loadReplyHistory();
     const MAX_REPLIES_PER_RUN = 2;
     const searchTerms = [
-      'AI Africa', 'Tech Africa', 'Digital Africa', 'Startup Africa',
-      'Alkimo',
-      'Lagos tech', 'Abuja tech', 'Accra tech', 'Nairobi tech',
-      'Johannesburg tech', 'Casablanca tech', 'Dakar tech', 'Abidjan tech'
+      'AI', 'artificial intelligence', 'machine learning', 'deep learning', 'LLM',
+      'gen AI', 'foundation models', 'computer vision', 'NLP', 'AI agents'
     ];
 
     // Vérifie le quota reply avant d'initialiser
