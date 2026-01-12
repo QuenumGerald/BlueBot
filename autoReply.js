@@ -12,6 +12,32 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Termes de recherche pour cibler l'IA en général et les pays en développement
+const SEARCH_TERMS = [
+  // IA générale
+  'AI', 'artificial intelligence', 'machine learning', 'deep learning', 'LLM',
+  'gen AI', 'foundation models', 'computer vision', 'NLP', 'AI agents',
+  // Asie du Sud et Asie du Sud-Est
+  'India tech', 'Bangalore AI', 'Hyderabad AI', 'Delhi AI',
+  'Pakistan tech', 'Karachi AI', 'Lahore AI',
+  'Bangladesh tech', 'Dhaka AI',
+  'Vietnam tech', 'Hanoi AI', 'Ho Chi Minh AI',
+  'Indonesia tech', 'Jakarta AI',
+  'Philippines tech', 'Manila AI',
+  // Amérique Latine
+  'Brazil tech', 'São Paulo AI', 'Rio AI',
+  'Mexico tech', 'CDMX AI',
+  'Argentina tech', 'Buenos Aires AI',
+  'Colombia tech', 'Bogota AI',
+  'Peru tech', 'Lima AI',
+  // Afrique (pays en développement)
+  'Kenya AI', 'Nairobi AI',
+  'Nigeria AI', 'Lagos AI', 'Abuja AI',
+  'Ghana AI', 'Accra AI',
+  'Ethiopia AI', 'Addis Ababa AI',
+  'South Africa AI', 'Johannesburg AI',
+];
+
 // Gestion de l'historique des utilisateurs déjà contactés
 const HISTORY_FILE = './reply-history.json';
 const MAX_HISTORY_DAYS = 14; // Durée en jours pendant laquelle on ne recontacte pas quelqu'un 
@@ -243,16 +269,8 @@ export async function autoReply() {
     const MAX_ACTIONS_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
-    // Termes de recherche pour trouver des posts pertinents pour la recherche d'emploi
-    const searchTerms = [
-      'AI Africa', 'Tech Africa', 'Digital Africa', 'Startup Africa',
-      'Alkimo',
-      'Lagos tech', 'Abuja tech', 'Accra tech', 'Nairobi tech',
-      'Johannesburg tech', 'Casablanca tech', 'Dakar tech', 'Abidjan tech'
-    ];
-
     // Récupère les posts récents contenant les termes de recherche
-    const uniquePosts = await fetchSearchPosts(searchTerms);
+    const uniquePosts = await fetchSearchPosts(SEARCH_TERMS);
     // Mélange aléatoire pour répondre à des posts variés à chaque run
     uniquePosts.sort(() => Math.random() - 0.5);
     if (uniquePosts.length === 0) {
