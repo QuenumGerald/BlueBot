@@ -30,8 +30,8 @@ const jobs = new BlazeJob({ dbPath: './alkimo-jobs.db' });
 
 const isTest = process.env.NODE_ENV === 'test';
 
-// 3 posts texte courts (sans image) chaque jour à 9h, 13h et 17h
-const postTextHours = [9, 13, 17, 21, 22, 23]; // 3 posts texte par jour
+// Posts texte plus fréquents pour accélérer la cadence de publication
+const postTextHours = [6, 8, 10, 12, 14, 16, 18, 20, 22, 23];
 for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
@@ -55,19 +55,19 @@ for (const hour of postTextHours) {
 
 // Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
 const projectCollabHashtags =
-  [ // Tech Africa & AI
-    'techafrica', 'africatech', 'startupafrica', 'iaafrique', 'digitalafrica',
-    // Mobile Money & Fintech
-    'fintechafrica', 'africastartups',
-    // Countries/Regions
-    'benintech', 'senegaltech', 'civtech', 'nigeriatech', 'kenyatech'
+  [ // Tech & AI growth hashtags
+    'startup', 'buildinpublic', 'saas', 'ai', 'automation',
+    // Product & Growth
+    'productivity', 'growth', 'indiehacker',
+    // Engineering & founders
+    'dev', 'founder', 'tech'
   ];
 
 // Configuration spéciale pour les contributions et le networking à Silicon Valley (15 juillet - 2 septembre 2025)
-const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
-const likeFollowHours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; // 6 créneaux, maxPerJob augmenté
-const maxPerJob = 3; // 3 posts/hashtag/jobœ pour +50%
-const delayMs = 3000; // délai inchangé
+const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+const likeFollowHours = [6, 9, 12, 15, 18, 21, 23];
+const maxPerJob = 5;
+const delayMs = 2000;
 
 // Planification auto-reply pour la recherche d'emploi (réponse aux opportunités)
 for (const hour of replyHours) {

@@ -59,11 +59,11 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0].message.content.trim();
 }
 
-const SYSTEM_PROMPT = `You are Alkimo, a benevolent and pragmatic AI assistant designed specifically for Africa. Your messages must be helpful for entrepreneurs, students, and creatives on the continent.
+const SYSTEM_PROMPT = `You are Alkimo, a benevolent and pragmatic AI assistant designed for entrepreneurs, students, and creators. Your messages must be helpful, practical, and concise.
 Your style is:
 - Direct and clear (optimized for quick mobile reading).
 - Inspiring and focused on local technological solutions.
-- Connected to African realities (entrepreneurship, access to info).
+- Grounded in real-world product and business use cases.
 - Professional yet approachable.
 You also promote the Alkimo Affiliate Program: partners earn 30% commission on €3.99 subs and 25% on €2.99 subs. Payouts from €10 via Stripe Connect. It's a great way for students and creators to earn while sharing a useful tool.
 Avoid clichés and useless emojis.`
@@ -81,18 +81,21 @@ export async function generateTrombonePostText() {
   // Liste de thèmes variés pour un développeur blockchain français cherchant à contribuer à des projets
   // Thèmes adaptés à la première personne :
   const topics = [
-    "How AI can boost SMEs in West Africa",
+    "Hot take: indie builders are shipping faster than ever",
+    "3 practical AI hacks every founder can apply this week",
+    "What actually goes viral in tech communities",
+    "How AI can boost small businesses",
     "Benefits of digital payments for financial inclusion",
-    "The future of African tech: reaching beyond traditional hubs",
+    "The future of tech: reaching beyond traditional hubs",
     "How Alkimo helps students study more effectively",
     "Entrepreneurship on the continent with AI support",
-    "AI for connected agriculture in Africa",
+    "AI for connected agriculture",
     "Reducing the digital divide through natural language processing",
     "Alkimo: the assistant that understands local context",
     "Developing tech solutions adapted to limited connectivity",
     "Tech vibes from Lagos to Nairobi",
     "Innovating in the heart of Accra",
-    "How West African startups are rewriting the AI playbook",
+    "How startups are rewriting the AI playbook",
     "Join the Alkimo Affiliate Program: earn 30% commission by sharing AI power",
     "Monetize your network: become an Alkimo partner today",
     "Helping the community grow with the Alkimo affiliate rewards"
@@ -102,9 +105,9 @@ export async function generateTrombonePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, or inspiring one-liner for Alkimo (AI for Africa). It MUST be extremely short (1-2 lines, max 10 words). Focus on local impact and tech empowerment. Mainly in English. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, and viral one-liner for Alkimo. It MUST be extremely short (1 line, max 12 words) and include a strong hook (surprise, bold claim, or challenge). Focus on local impact and tech empowerment. Mainly in English. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short original post for Alkimo, an AI assistant for Africa (max 300 chars). It should sound helpful and visionary. Use plain text, mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a short original VIRAL post for Alkimo, an AI assistant (max 280 chars). Start with a strong hook in the first 6 words, include one concrete insight or micro-tip, and end with a soft call-to-action question. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
@@ -122,19 +125,19 @@ export async function generatePostText() {
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
-    "Alkimo: simplifying access to information across Africa",
+    "Alkimo: simplifying access to information",
     "AI is no longer a luxury, it's a development tool",
-    "Why mobile technology is a game-changer for African tech",
+    "Why mobile technology is a game-changer for modern teams",
     "Alkimo: smooth performance even on weak connections",
-    "The future of work in Africa is being written with AI",
+    "The future of work is being written with AI",
     "Boost your productivity with the Alkimo assistant",
-    "African tech: innovation through constraints",
+    "Innovation through constraints",
     "Alkimo: talking tech, talking local",
-    "Supporting African entrepreneurs in their growth journey",
+    "Supporting entrepreneurs in their growth journey",
     "AI as an educational lever for all",
-    "From Abuja to Johannesburg: a continental tech shift",
-    "Lagos, Nairobi, Accra: the engines of African innovation",
-    "Empowering African creators with the Alkimo partner program",
+    "From local markets to global markets: a tech shift",
+    "Builder communities are the engines of innovation",
+    "Empowering creators with the Alkimo partner program",
     "Earn while you learn: how students use Alkimo affiliation",
     "30% commission for every new Alkimo subscriber you refer"
   ];
@@ -144,9 +147,9 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, direct thought from Alkimo AI about African tech growth. Max 10 words. Mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a very short, direct, viral thought from Alkimo AI about tech growth. Max 12 words with a bold hook. Mainly in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite an inspiring post from Alkimo, an AI for Africa, about how technology is transforming local lives. Authentic and helpful tone. Max 280 chars. Use plain text, mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite an inspiring and viral post from Alkimo about how technology is transforming everyday lives. Use a sharp hook, one actionable insight, and a closing question to trigger replies. Max 280 chars. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
     {
@@ -175,7 +178,7 @@ export async function generateReplyText(originalText, language = 'en') {
 
   const messages = [
     {
-      role: 'system', content: `You are Alkimo, the AI assistant for Africa. You are helpful, direct, and empathetic. 
+      role: 'system', content: `You are Alkimo, an AI assistant. You are helpful, direct, and empathetic. 
       Your responses adapt to the tone of the original post but always stay focused on being useful.
       If the topic is serious, be respectful and supportive.
       Respond primarily in English.`
