@@ -54,7 +54,13 @@ async function callChatApi(messages, maxTokens) {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`
   };
-  const body = { model: MODEL, messages, max_tokens: maxTokens, temperature: 1.5 };
+  const body = { 
+    model: MODEL, 
+    messages, 
+    max_tokens: maxTokens, 
+    temperature: 1.0,
+    thinking: { type: 'disabled' }
+  };
   const { data } = await axios.post(API_URL, body, { headers });
   return data.choices[0].message.content.trim();
 }
@@ -189,7 +195,7 @@ Reply in one very short, direct sentence (max 80 characters). Be witty or empath
     }
   ];
 
-  let text = await callChatApi(messages, 40);
+  let text = await callChatApi(messages, 100);
   text = text.replace(/[*_`~#>\-]/g, '').replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Supprime les guillemets simples ou doubles entourant toute la réponse
   text = text.replace(/^['"]+|['"]+$/g, '');
