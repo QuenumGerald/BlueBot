@@ -31,7 +31,7 @@ const jobs = new BlazeJob({ dbPath: './alkimo-jobs.db' });
 const isTest = process.env.NODE_ENV === 'test';
 
 // Posts texte plus fréquents pour accélérer la cadence de publication
-const postTextHours = [6, 8, 10, 12, 14, 16, 18, 20, 22, 23];
+const postTextHours = [6, 7, 8, 10, 11, 12, 14, 15, 16, 18, 19, 20, 22, 23];
 for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
@@ -82,7 +82,7 @@ for (const hour of replyHours) {
   }, {
     name: `AutoReply ${hour}h`,
     runAt: isTest ? inMinutes(1) : nextHour(hour),
-    interval: isTest ? 5 * 60 * 1000 : 12 * 60 * 60 * 1000, // toutes les 5 min en test
+    interval: isTest ? 5 * 60 * 1000 : 8 * 60 * 60 * 1000, // toutes les 8h en production, 5 min en test
     maxRuns: 3650,
   });
 }

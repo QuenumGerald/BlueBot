@@ -85,17 +85,23 @@ export async function generateTrombonePostText() {
     "3 practical AI hacks every founder can apply this week",
     "What actually goes viral in tech communities",
     "How AI can boost small businesses",
-    "Benefits of digital payments for financial inclusion",
-    "The future of tech: reaching beyond traditional hubs",
+    "Benefits of AI automation for everyday workflows",
+    "The future of tech: AI agents that actually work",
     "How Alkimo helps students study more effectively",
-    "Entrepreneurship on the continent with AI support",
-    "AI for connected agriculture",
-    "Reducing the digital divide through natural language processing",
-    "Alkimo: the assistant that understands local context",
-    "Developing tech solutions adapted to limited connectivity",
-    "Tech vibes from Lagos to Nairobi",
-    "Innovating in the heart of Accra",
+    "Entrepreneurship in the AI era: opportunities everywhere",
+    "AI for smarter productivity and focus",
+    "Building with natural language: the new no-code",
+    "Alkimo: the assistant that gets things done",
+    "Developing tech solutions that just work",
+    "Tech vibes from builders worldwide",
+    "Innovating with AI at the frontier",
     "How startups are rewriting the AI playbook",
+    "AI bias: why diverse training data matters more than ever",
+    "The hidden cost of AI automation nobody talks about",
+    "When AI hallucinates: how to spot and verify generated content",
+    "Privacy in the AI era: what users actually need to know",
+    "Job displacement vs job creation: the real AI debate",
+    "Why transparency in AI systems should be non-negotiable",
     "Join the Alkimo Affiliate Program: earn 30% commission by sharing AI power",
     "Monetize your network: become an Alkimo partner today",
     "Helping the community grow with the Alkimo affiliate rewards"
@@ -105,9 +111,9 @@ export async function generateTrombonePostText() {
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, and viral one-liner for Alkimo. It MUST be extremely short (1 line, max 12 words) and include a strong hook (surprise, bold claim, or challenge). Focus on local impact and tech empowerment. Mainly in English. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, punchy, and viral one-liner for Alkimo. It MUST be extremely short (1 line, max 12 words) and include a strong hook (surprise, bold claim, or challenge). Focus on AI productivity and tech empowerment. If the topic is about AI risks or ethics, be factual and constructive, not alarmist. Mainly in English. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short original VIRAL post for Alkimo, an AI assistant (max 280 chars). Start with a strong hook in the first 6 words, include one concrete insight or micro-tip, and end with a soft call-to-action question. Use plain text, mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a short original VIRAL post for Alkimo, an AI assistant (max 280 chars). Start with a strong hook in the first 6 words, include one concrete insight or micro-tip, and end with a soft call-to-action question. If the topic is about AI risks or ethics, be balanced, factual, and constructive — never alarmist. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
@@ -127,16 +133,20 @@ export async function generatePostText() {
   const topics = [
     "Alkimo: simplifying access to information",
     "AI is no longer a luxury, it's a development tool",
-    "Why mobile technology is a game-changer for modern teams",
-    "Alkimo: smooth performance even on weak connections",
+    "Why AI assistants are a game-changer for modern teams",
+    "Alkimo: fast, reliable, ready when you are",
     "The future of work is being written with AI",
     "Boost your productivity with the Alkimo assistant",
-    "Innovation through constraints",
-    "Alkimo: talking tech, talking local",
+    "Innovation through smart automation",
+    "Alkimo: AI that talks your language",
     "Supporting entrepreneurs in their growth journey",
-    "AI as an educational lever for all",
-    "From local markets to global markets: a tech shift",
+    "AI as an educational lever for everyone",
+    "From ideas to execution: the AI shift",
     "Builder communities are the engines of innovation",
+    "AI ethics: building technology that serves everyone fairly",
+    "The risks of over-relying on AI for critical decisions",
+    "Deepfakes and misinformation: AI's most dangerous side effect",
+    "Why human oversight in AI is still essential in 2025",
     "Empowering creators with the Alkimo partner program",
     "Earn while you learn: how students use Alkimo affiliation",
     "30% commission for every new Alkimo subscriber you refer"
@@ -147,9 +157,9 @@ export async function generatePostText() {
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, direct, viral thought from Alkimo AI about tech growth. Max 12 words with a bold hook. Mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a very short, direct, viral thought from Alkimo AI about tech growth. Max 12 words with a bold hook. If the topic is about AI risks or ethics, be factual and constructive, not alarmist. Mainly in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite an inspiring and viral post from Alkimo about how technology is transforming everyday lives. Use a sharp hook, one actionable insight, and a closing question to trigger replies. Max 280 chars. Use plain text, mainly in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite an inspiring and viral post from Alkimo about how AI is transforming everyday productivity. Use a sharp hook, one actionable insight, and a closing question to trigger replies. If the topic is about AI risks or ethics, be balanced, factual, and constructive — never alarmist. Max 280 chars. Use plain text, mainly in English. No markdown, no emojis.`;
   }
   const messages = [
     {
