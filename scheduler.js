@@ -89,6 +89,7 @@ for (const hour of likeFollowHours) {
   jobs.schedule(async () => {
     try {
       console.log(`[BlazeJob] [START] Job like/follow ${hour}h`);
+      await initBluesky();
       for (const hashtag of projectCollabHashtags) {
         await likeAndFollowHashtag(hashtag, maxPerJob, delayMs);
       }
