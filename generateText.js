@@ -26,7 +26,7 @@ const API_URL = provider === 'deepseek'
     ? 'https://api.openai.com/v1/chat/completions'
     : null;
 
-const MODEL = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo';
+const MODEL = provider === 'deepseek' ? 'deepseek-v4-flash' : 'gpt-3.5-turbo';
 
 
 // ---------------------------------------------------------------------

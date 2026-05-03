@@ -10,7 +10,7 @@
   "dependencies": {
     "@atproto/api": "^0.14.0",
     "axios": "^1.6.0",
-    "blazerjob": "1.0.1",
+    "blazerjob": "^2.0.7",
     "dotenv": "^16.3.1",
     "franc-min": "^6.2.0",
     "sharp": "^0.34.2"
