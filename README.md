@@ -18,6 +18,7 @@ Bot Bluesky complet en Node.js/ESM pour générer, poster, liker, suivre et rép
 ## Fonctionnalités
 - **Génération d’images memes Clippy** via l’API Hugging Face (Stable Diffusion)
 - **Génération de textes posts et replies** via DeepSeek ou OpenAI (GPT)
+- **Récupération automatique quotidienne des grosses actualités et de quelques sources tech** puis génération de posts qui gardent la personnalité de Joe
 - **Publication automatique** sur Bluesky (texte + image)
 - **Like et follow automatiques** de comptes ciblés
 - **Réponses automatiques** aux posts #CLIPPY
@@ -60,6 +61,12 @@ BLUESKY_HANDLE=ton.handle.bsky.social
 BLUESKY_PASSWORD=ton_mot_de_passe
 HUGGINGFACE_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 DEEPSEEK_KEY=ds_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  # ou OPENAI_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NEWS_SOURCES=https://feeds.bbci.co.uk/news/rss.xml,https://www.npr.org/rss/rss.php?id=1001       # optionnel : gros flux RSS généralistes à relever chaque jour
+NEWS_TECH_SOURCES=https://feeds.bbci.co.uk/news/technology/rss.xml,https://techcrunch.com/feed/  # optionnel : quelques flux tech en complément
+NEWS_CACHE_PATH=./analytics/current-news-topics.json                                           # optionnel : cache quotidien des sujets
+NEWS_TIMEOUT_MS=5000                                                                          # optionnel : délai max par source
+NEWS_MAX_ITEMS=30                                                                             # optionnel : nombre max de sujets en cache
+NEWS_MAX_TECH_ITEMS=6                                                                         # optionnel : nombre max de sujets tech dans le cache quotidien
 ```
 
 ---
@@ -70,7 +77,8 @@ DEEPSEEK_KEY=ds_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  # ou OPENAI_KEY=sk-xxxxxxxxxxx
 BlueBot/
 ├── bluesky.js          # Gestion de l’agent Bluesky & upload image
 ├── generateImage.js    # Génération d’image Clippy via Hugging Face
-├── generateText.js     # Génération de texte (post/reply) via IA
+├── newsTopics.js      # Récupération quotidienne/cache des sources d’actualité
+├── generateText.js     # Utilisation des sujets d’actualité + génération de texte (post/reply) via IA
 ├── postImage.js        # Publication d’un post Clippy (texte + image)
 ├── likeAndFollow.js    # Like & follow automatiques
 ├── autoReply.js        # Réponses automatiques aux posts #CLIPPY
@@ -110,9 +118,10 @@ node scheduler.js
 ```
 
 Le scheduler planifie automatiquement :
-- 3 posts Clippy par jour (9h, 15h, 21h)
-- 1 session like/follow à 10h
-- 1 session auto-reply à 12h
+- une récupération automatique quotidienne des sources d’actualité (par défaut à 6h) avec cache local
+- des posts texte à heures fixes ; chaque post pioche dans le cache du jour, principalement composé des grosses news avec quelques sujets tech
+- des sessions like/follow ciblées
+- des sessions auto-reply
 
 ---
 
