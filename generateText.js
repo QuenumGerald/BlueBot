@@ -7,6 +7,7 @@
 
 import axios from 'axios'
 import dotenv from 'dotenv'
+import { getCurrentNewsTopic } from './newsTopics.js'
 
 dotenv.config()
 
@@ -27,7 +28,6 @@ const API_URL = provider === 'deepseek'
     : null;
 
 const MODEL = provider === 'deepseek' ? 'deepseek-v4-flash' : 'gpt-3.5-turbo';
-
 
 // ---------------------------------------------------------------------
 async function callGeminiApi(messages, maxTokens = 30) {
@@ -77,6 +77,7 @@ const SYSTEM_POST = `You are Joe, a French blockchain developer (Solidity, TypeS
  * @returns {Promise<string>}
  */
 export async function generateTrombonePostText() {
+  const currentTopic = await getCurrentNewsTopic();
   // Liste de thèmes variés pour un développeur blockchain français cherchant à contribuer à des projets
   // Thèmes adaptés à la première personne :
   const topics = [
@@ -91,7 +92,9 @@ export async function generateTrombonePostText() {
     "My consensus algo: unanimous laughter at my own jokes",
     "My economic thesis treats humor as reserve currency"
   ];
-  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+  const randomTopic = currentTopic
+    ? `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
+    : topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.8;
   let userPrompt;
@@ -113,6 +116,7 @@ export async function generateTrombonePostText() {
 }
 
 export async function generatePostText() {
+  const currentTopic = await getCurrentNewsTopic();
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
   // Topics adaptés à la première personne :
   const topics = [
@@ -128,12 +132,14 @@ export async function generatePostText() {
     "Networking IRL and on-chain—sometimes simultaneously"
   ];
   // Choix aléatoire d'un topic
-  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+  const randomTopic = currentTopic
+    ? `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
+    : topics[Math.floor(Math.random() * topics.length)];
   // Tirage aléatoire pour la longueur du post (80% court, 20% moyen/long)
   const isShort = Math.random() < 0.5;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\").only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\"). Only plain text, in English. No markdown, no emojis.`;
   } else {
     userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
   }

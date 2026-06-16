@@ -6,6 +6,7 @@ const { BlazeJob } = pkg;
 import dotenv from 'dotenv';
 
 import { generateTrombonePostText } from './generateText.js';
+import { refreshDailyNewsTopics } from './newsTopics.js';
 import { likeAndFollowHashtag } from './likeAndFollow.js';
 import { agent, initBluesky } from './bluesky.js';
 
@@ -28,6 +29,24 @@ console.log('=== BlueBot Scheduler started! (Render log test) ===');
 const jobs = new BlazeJob({ dbPath: './clippy-jobs.db' });
 
 const isTest = process.env.NODE_ENV === 'test';
+
+
+// Récupère automatiquement les sources d'actualité une fois par jour avant les posts.
+jobs.schedule(async () => {
+  try {
+    console.log('[BlazeJob] [START] Refresh daily news topics');
+    const topics = await refreshDailyNewsTopics({ force: true });
+    console.log(`[BlazeJob][News] ${topics.length} sujets d'actualité en cache`);
+    console.log('[BlazeJob] [END] Refresh daily news topics');
+  } catch (err) {
+    console.error('[BlazeJob][ERROR] Refresh daily news topics :', err);
+  }
+}, {
+  name: 'Daily News Topic Refresh',
+  runAt: isTest ? inMinutes(1) : nextHour(6),
+  interval: 24 * 60 * 60 * 1000,
+  maxRuns: 3650,
+});
 
 // 3 posts texte courts (sans image) chaque jour à 9h, 13h et 17h
 const postTextHours = [9, 13, 17, 21, 22, 23]; // 3 posts texte par jour
