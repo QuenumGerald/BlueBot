@@ -24,6 +24,22 @@ function nextHour(hour) {
 function inMinutes(minutes) {
   return new Date(Date.now() + minutes * 60 * 1000);
 }
+
+async function fetchTrendingTopics(limit = 6) {
+  try {
+    const res = await agent.app.bsky.unspecced.getTrendingTopics({
+      viewer: agent.session?.did,
+      limit
+    });
+    const topics = [...(res.data.topics || []), ...(res.data.suggested || [])]
+      .map(topic => topic.displayName || topic.topic)
+      .filter(Boolean);
+    return Array.from(new Set(topics)).slice(0, limit);
+  } catch (error) {
+    console.warn('[Bluesky][Trends] Impossible de récupérer les sujets tendance, fallback sur RSS/evergreen :', error?.response?.data || error.message);
+    return [];
+  }
+}
 console.log('=== Alkimo Bot Scheduler started! ===');
 // Initialise la base de données locale pour stocker l'état des jobs
 const jobs = new BlazeJob({ dbPath: './alkimo-jobs.db' });
@@ -37,7 +53,8 @@ for (const hour of postTextHours) {
     try {
       console.log(`[BlazeJob] [START] Job texte Alkimo ${hour}h`);
       await initBluesky();
-      const text = await generateTrombonePostText();
+      const trendingTopics = await fetchTrendingTopics();
+      const text = await generateTrombonePostText(trendingTopics);
       await agent.post({ text });
       console.log(`[BlazeJob][PostTexte] Texte posté à ${hour}h :`, text);
       console.log(`[BlazeJob] [END] Job texte Alkimo ${hour}h`);
