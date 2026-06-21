@@ -174,7 +174,7 @@ export async function generatePostText() {
   let userPrompt;
 
   if (isNudgeBotPost) {
-    userPrompt = `${randomTopic.text}\nWrite a very short French post in the first person saying that I created NudgeBot, an open-source assistant for developers. Mention that it is simple to install. Include exactly this link: ${NUDGEBOT_URL}. Keep it natural, humble, and under 220 characters. No markdown, no emojis, no hashtags.`;
+    userPrompt = `${randomTopic.text}\nWrite a very short English post in the first person saying that I created NudgeBot, an open-source assistant for developers. Mention that it is simple to install. Include exactly this link: ${NUDGEBOT_URL}. Keep it natural, humble, and under 220 characters. No markdown, no emojis, no hashtags.`;
   } else if (isShort) {
     userPrompt = `${randomTopic.text}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me"). Only plain text, in English. No markdown, no emojis.`;
   } else {
@@ -184,7 +184,7 @@ export async function generatePostText() {
   const messages = [
     {
       role: 'system', content: isNudgeBotPost
-        ? `You are Joe, a French developer sharing a concise personal project update. Write in French, in first person, like a real social post. Be clear and humble: I created this open-source project, it is an assistant for developers, and it is simple to install. Keep it short. Always include the project link exactly once: ${NUDGEBOT_URL}. No emoji, no markdown, no hashtags, no sales tone.`
+        ? `You are Joe, a French developer sharing a concise personal project update. Write in English, in first person, like a real social post. Be clear and humble: I created this open-source project, it is an assistant for developers, and it is simple to install. Keep it short. Always include the project link exactly once: ${NUDGEBOT_URL}. No emoji, no markdown, no hashtags, no sales tone.`
         : `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
       - Make clever wordplay, especially around tech terms ("My relationship status: committed... to the git repository")
       - Use humorous exaggeration about tech struggles ("Spent so long debugging I'm practically speaking binary now")
