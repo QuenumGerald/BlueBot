@@ -54,15 +54,39 @@ async function callChatApi(messages, maxTokens) {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${provider === 'deepseek' ? DEEPSEEK_KEY : OPENAI_KEY}`
   };
-  const body = { 
-    model: MODEL, 
-    messages, 
-    max_tokens: maxTokens, 
+  const body = {
+    model: MODEL,
+    messages,
+    max_tokens: maxTokens,
     temperature: 1.0,
     thinking: { type: 'disabled' }
   };
   const { data } = await axios.post(API_URL, body, { headers });
   return data.choices[0].message.content.trim();
+}
+
+
+const NUDGEBOT_URL = 'https://quenumgerald.github.io/NudgeBot';
+const NUDGEBOT_PROMO_TOPICS = [
+  'NudgeBot as an open-source assistant for developers',
+  'A short launch note about NudgeBot being easy to install',
+  'A concise personal update about creating NudgeBot',
+  'NudgeBot helping developers stay in flow',
+  'A minimal open-source tool announcement for devs'
+];
+
+function ensureNudgeBotLink(text, maxLength = 280) {
+  const cleaned = text
+    .replace(/[*_`~#>]/g, '')
+    .replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const withLink = cleaned.includes(NUDGEBOT_URL) ? cleaned : `${cleaned} ${NUDGEBOT_URL}`.trim();
+  if (withLink.length <= maxLength) return withLink;
+
+  const availableTextLength = Math.max(maxLength - NUDGEBOT_URL.length - 1, 0);
+  return `${withLink.slice(0, availableTextLength).trim()} ${NUDGEBOT_URL}`.trim();
 }
 
 const SYSTEM_POST = `You are Joe, a French blockchain developer (Solidity, TypeScript), naturally curious and open-minded. Write as yourself: friendly, witty, and sometimes a bit ironic. Share thoughts, stories, or questions like you would with peers—don’t be afraid to show personality or make a clever joke. Use contractions and ask questions if it feels right. Keep it short (under 280 characters), avoid crypto clichés and emojis, and never sound like you’re selling something. If you mention a project or someone’s work, show genuine interest or appreciation. Write in first person, like a real person would post on social media. Never sound generic or overly formal. Avoid robotic phrasing.`
@@ -118,7 +142,8 @@ export async function generateTrombonePostText() {
 export async function generatePostText() {
   const currentTopic = await getCurrentNewsTopic();
   // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
-  // Topics adaptés à la première personne :
+  // Thèmes adaptés à la première personne : on conserve les anciens sujets, les sujets d'actualité,
+  // et on ajoute ponctuellement NudgeBot sans remplacer les autres inspirations.
   const topics = [
     "Deploying code and coffee in equal measure",
     "Debugging smart contracts, debugging my caffeine intake",
@@ -131,21 +156,36 @@ export async function generatePostText() {
     "DeFi audits and dad jokes: my dual specialty",
     "Networking IRL and on-chain—sometimes simultaneously"
   ];
-  // Choix aléatoire d'un topic
-  const randomTopic = currentTopic
-    ? `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
-    : topics[Math.floor(Math.random() * topics.length)];
-  // Tirage aléatoire pour la longueur du post (80% court, 20% moyen/long)
+  const topicChoices = [
+    ...topics.map(topic => ({ type: 'legacy', text: topic })),
+    ...NUDGEBOT_PROMO_TOPICS.map(topic => ({ type: 'nudgebot', text: topic }))
+  ];
+
+  if (currentTopic) {
+    topicChoices.push({
+      type: 'news',
+      text: `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
+    });
+  }
+
+  const randomTopic = topicChoices[Math.floor(Math.random() * topicChoices.length)];
+  const isNudgeBotPost = randomTopic.type === 'nudgebot';
   const isShort = Math.random() < 0.5;
   let userPrompt;
-  if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person (\"I\", \"my\", \"me\"). Only plain text, in English. No markdown, no emojis.`;
+
+  if (isNudgeBotPost) {
+    userPrompt = `${randomTopic.text}\nWrite a very short French post in the first person saying that I created NudgeBot, an open-source assistant for developers. Mention that it is simple to install. Include exactly this link: ${NUDGEBOT_URL}. Keep it natural, humble, and under 220 characters. No markdown, no emojis, no hashtags.`;
+  } else if (isShort) {
+    userPrompt = `${randomTopic.text}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me"). Only plain text, in English. No markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person (\"I\", \"my\", \"me\") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic.text}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person ("I", "my", "me") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
   }
+
   const messages = [
     {
-      role: 'system', content: `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
+      role: 'system', content: isNudgeBotPost
+        ? `You are Joe, a French developer sharing a concise personal project update. Write in French, in first person, like a real social post. Be clear and humble: I created this open-source project, it is an assistant for developers, and it is simple to install. Keep it short. Always include the project link exactly once: ${NUDGEBOT_URL}. No emoji, no markdown, no hashtags, no sales tone.`
+        : `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
       - Make clever wordplay, especially around tech terms ("My relationship status: committed... to the git repository")
       - Use humorous exaggeration about tech struggles ("Spent so long debugging I'm practically speaking binary now")
       - Occasionally reference funny French-American culture clashes ("Americans call it 'coffee', I call it 'barely caffeinated water'")
@@ -153,19 +193,22 @@ export async function generatePostText() {
       - Add unexpected twists to technical conversations
       - Sometimes make small typos or grammatical errors (1 in 10 messages) as a real human would
       - Share amusing personal anecdotes about coding mishaps
-      
+
       Your writing style should be conversational, witty, and genuinely funny without forcing jokes. Balance humor with authenticity - you're a real person first, comedian second. Keep messages under 280 chars. No emoji or markdown formatting.`
     },
     { role: 'user', content: userPrompt }
   ];
-  let text = await callChatApi(messages, 280);
+
+  let text = await callChatApi(messages, isNudgeBotPost ? 120 : 280);
+  if (isNudgeBotPost) return ensureNudgeBotLink(text, 280);
+
   // Nettoyage du markdown (conserve tirets, retours à la ligne et majuscules)
   text = text.replace(/[*_`~#>]/g, '').replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
   // Coupe intelligemment à 280 caractères max (posts plus courts)
   if (text.length > 280) text = text.slice(0, 280);
   return text.trim();
-
 }
+
 
 // ---------------------------------------------------------------------
 // REPLY GENERATOR -------------------------------------------------------
@@ -192,7 +235,7 @@ export async function generateReplyText(originalText, language = 'en') {
       - Offer considerate perspectives that reflect real human concern
       - Maintain authenticity without forced positivity
       - Respond with appropriate seriousness and sensitivity
-      
+
       Keep replies under 280 characters. Present blockchain positively. Respond in ${isFrench ? 'French' : 'English'}.`
     },
     {
