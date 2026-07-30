@@ -1,6 +1,6 @@
 # 🤖 Clippy Bluesky Bot
 
-Bot Bluesky complet en Node.js/ESM pour générer, poster, liker, suivre et répondre automatiquement avec des memes IA de Clippy !
+Bot Bluesky en Node.js/ESM conçu pour faire vivre une communauté autour du développement et de l’IA, avec Clippy comme identité éditoriale.
 
 ## Sommaire
 - [Fonctionnalités](#fonctionnalités)
@@ -18,10 +18,12 @@ Bot Bluesky complet en Node.js/ESM pour générer, poster, liker, suivre et rép
 ## Fonctionnalités
 - **Génération d’images memes Clippy** via l’API Hugging Face (Stable Diffusion)
 - **Génération de textes posts et replies** via DeepSeek ou OpenAI (GPT)
-- **Récupération automatique quotidienne des grosses actualités et de quelques sources tech** puis génération de posts qui gardent la personnalité de Joe
+- **Posts dev & IA orientés communauté** : retours d’expérience, questions ouvertes, ressources et apprentissages concrets
+- **Ton humain, accessible et sans marketing agressif**, pensé pour accueillir les débutants comme les profils expérimentés
+- **Récupération automatique quotidienne des actualités et sources tech** pour nourrir des discussions utiles sans simplement résumer les titres
 - **Publication automatique** sur Bluesky (texte + image)
 - **Like et follow automatiques** de comptes ciblés
-- **Réponses automatiques** aux posts #CLIPPY
+- **Réponses contextuelles** aux conversations dev, open source et IA, avec une contribution utile plutôt qu’un compliment générique
 - **Orchestration complète** via un scheduler programmable (`blazerjob`)
 
 ---
@@ -66,7 +68,7 @@ NEWS_TECH_SOURCES=https://feeds.bbci.co.uk/news/technology/rss.xml,https://techc
 NEWS_CACHE_PATH=./analytics/current-news-topics.json                                           # optionnel : cache quotidien des sujets
 NEWS_TIMEOUT_MS=5000                                                                          # optionnel : délai max par source
 NEWS_MAX_ITEMS=30                                                                             # optionnel : nombre max de sujets en cache
-NEWS_MAX_TECH_ITEMS=6                                                                         # optionnel : nombre max de sujets tech dans le cache quotidien
+NEWS_MAX_TECH_ITEMS=24                                                                        # optionnel : nombre max de sujets tech/IA prioritaires dans le cache quotidien
 ```
 
 ---
@@ -119,7 +121,7 @@ node scheduler.js
 
 Le scheduler planifie automatiquement :
 - une récupération automatique quotidienne des sources d’actualité (par défaut à 6h) avec cache local
-- des posts texte à heures fixes ; chaque post pioche dans le cache du jour, principalement composé des grosses news avec quelques sujets tech
+- des posts texte à heures fixes ; chaque post régulier part d’une actualité tech/IA récente du cache, les sujets intemporels ne servant que si les flux sont indisponibles
 - des sessions like/follow ciblées
 - des sessions auto-reply
 

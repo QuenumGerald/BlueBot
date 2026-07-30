@@ -1,6 +1,6 @@
 // --------------------------------------------------------
 // generateText.js  •  Joe Edition  (v2 – 298‑char safety)
-// Generates funny posts & replies for the Joe Bluesky bot
+// Generates community-minded dev & AI posts and replies for the Joe Bluesky bot
 // using DeepSeek (priority) or OpenAI (fallback)
 // ▸ Bluesky hard limit ≈ 300 char → we enforce 298 to stay safe
 // --------------------------------------------------------
@@ -89,7 +89,12 @@ function ensureNudgeBotLink(text, maxLength = 280) {
   return `${withLink.slice(0, availableTextLength).trim()} ${NUDGEBOT_URL}`.trim();
 }
 
-const SYSTEM_POST = `You are Joe, a French blockchain developer (Solidity, TypeScript), naturally curious and open-minded. Write as yourself: friendly, witty, and sometimes a bit ironic. Share thoughts, stories, or questions like you would with peers—don’t be afraid to show personality or make a clever joke. Use contractions and ask questions if it feels right. Keep it short (under 280 characters), avoid crypto clichés and emojis, and never sound like you’re selling something. If you mention a project or someone’s work, show genuine interest or appreciation. Write in first person, like a real person would post on social media. Never sound generic or overly formal. Avoid robotic phrasing.`
+const COMMUNITY_VOICE = `The goal is to bring developers and AI builders together. Share useful, concrete experiences, invite peers to compare approaches, and make beginners feel welcome. Favor open questions, lessons learned, resources, build-in-public updates, and genuine replies over self-promotion. Never use engagement bait or pretend to know something you do not.`;
+
+function newsContext(topic) {
+  if (!topic) return null;
+  return `Current headline: ${topic.title}\nSource: ${topic.source}\nArticle: ${topic.url || 'link unavailable'}\nUse only the information in the headline. Do not invent article details. Clearly frame any interpretation as a question or personal reaction.`;
+}
 
 
 /**
@@ -102,33 +107,33 @@ const SYSTEM_POST = `You are Joe, a French blockchain developer (Solidity, TypeS
  */
 export async function generateTrombonePostText() {
   const currentTopic = await getCurrentNewsTopic();
-  // Liste de thèmes variés pour un développeur blockchain français cherchant à contribuer à des projets
+  // Thèmes dev et IA pensés pour lancer des échanges utiles dans la communauté.
   // Thèmes adaptés à la première personne :
   const topics = [
-    "Exploring open-source blockchain projects in Silicon Valley",
-    "Optimizing gas costs while connecting with fellow developers",
-    "Building DeFi projects and contributing to the Web3 ecosystem",
-    "My models predict bullish trends for sarcastic tweets",
-    "I developed an economic indicator based on dev tears",
-    "My tokenomics paper rejected—too many puns, not enough math",
-    "I priced technical jokes; returns diminish exponentially",
-    "Bullish on interoperability, bearish on seriousness",
-    "My consensus algo: unanimous laughter at my own jokes",
-    "My economic thesis treats humor as reserve currency"
+    "A small lesson learned while shipping an AI feature",
+    "A practical question about evaluating LLM outputs",
+    "An open-source tool that improved my developer workflow",
+    "Where AI coding assistants help and where I keep human review",
+    "A debugging mistake other developers can learn from",
+    "How to make a first contribution to an open-source AI project",
+    "A useful TypeScript, Rust, or Python pattern worth discussing",
+    "Building in public and asking peers for honest technical feedback",
+    "Making AI concepts accessible without hiding their limitations",
+    "Celebrating a community member's useful project or insight"
   ];
   const randomTopic = currentTopic
-    ? `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
+    ? newsContext(currentTopic)
     : topics[Math.floor(Math.random() * topics.length)];
   // 40% posts très courts, 60% posts moyens/longs
   const isShort = Math.random() < 0.8;
   let userPrompt;
   if (isShort) {
-    userPrompt = `${randomTopic}\nWrite a very short, punchy, or funny one-liner for Joe, a French blockchain developer visiting Silicon Valley. It MUST be extremely short (1-2 lines, max 10 words) and written in the first person ("I", "my", "me"). Focus on technical precision with accessible language.English only. No emoji, no markdown.`;
+    userPrompt = `${randomTopic}\nWrite a very short, warm thought from a developer who builds with AI. It MUST be extremely short (1-2 lines, max 12 words), in the first person, and give peers something useful or relatable to respond to. English only. No emoji, no markdown.`;
   } else {
-    userPrompt = `${randomTopic}\nWrite a short original funny meme post for Joe, a French blockchain developer visiting Silicon Valley (max 300 chars) . Humour mandatory. It MUST be written in the first person (\"I\", \"my\", \"me\") as if Joe, a French blockchain developer, is speaking. You can use up to 280 characters, any style or structure, but avoid repeating previous formats. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic}\nWrite a short, original post from Joe, a French developer exploring AI (max 280 chars). Share one concrete observation, lesson, or honest question that can start a useful discussion among builders. Light humor is welcome but not mandatory. First person, plain English, no markdown, no emojis.`;
   }
   const messages = [
-    { role: 'system', content: `You are Joe, a French full-stack blockchain developer with expertise in Solidity, TypeScript, and Rust. looking to contribute to interesting open-source projects and build meaningful connections with the tech community. Your posts should reflect your technical expertise in blockchain, DeFi projects, and smart contract development. You're professional but approachable, sharing insights about blockchain technology, open-source contributions, and Silicon Valley tech culture. Write in first person. Keep it under 280 characters. No crypto clichés. Balance technical accuracy with genuine interest in collaboration. NEVER include any surprise effect in your response. Do not use interjections like 'ah!', 'oh!', 'wow!', or similar at the start of the post or reply.` },
+    { role: 'system', content: `You are Joe, a French full-stack developer working with TypeScript, Rust, open source, and AI. You are here to learn with other builders, share practical experience, and help create a welcoming technical community. ${COMMUNITY_VOICE} Write in first person and keep it under 280 characters. Be technically accurate, approachable, and specific. Do not use hype, crypto clichés, or surprise interjections.` },
     { role: 'user', content: userPrompt }
   ];
   let text = await callChatApi(messages, 200);
@@ -141,34 +146,26 @@ export async function generateTrombonePostText() {
 
 export async function generatePostText() {
   const currentTopic = await getCurrentNewsTopic();
-  // Liste de topics/moods pour varier les posts - maintenant avec expertise économique/tech et humour
-  // Thèmes adaptés à la première personne : on conserve les anciens sujets, les sujets d'actualité,
-  // et on ajoute ponctuellement NudgeBot sans remplacer les autres inspirations.
+  // Les actualités sont prioritaires. Ces thèmes ne servent qu'en cas d'indisponibilité des flux.
   const topics = [
-    "Deploying code and coffee in equal measure",
-    "Debugging smart contracts, debugging my caffeine intake",
-    "My merge requests come with a side of puns",
-    "Gas optimization: my code and my Paris–SFO flights",
-    "Open-source by day, open-mic by night",
-    "I fork repos, not baguettes (usually)",
-    "My Solidity is as strong as my espresso",
-    "Contributing code, collecting memes",
-    "DeFi audits and dad jokes: my dual specialty",
-    "Networking IRL and on-chain—sometimes simultaneously"
+    "What I learned today while pairing with an AI coding assistant",
+    "A prompt that failed and the engineering lesson behind it",
+    "How I review AI-generated code before merging it",
+    "An open-source contribution that taught me something new",
+    "A tiny developer tool that saved me time this week",
+    "A question for builders evaluating LLM applications",
+    "Sharing a TypeScript, Rust, or Python debugging lesson",
+    "How developers can welcome newcomers into AI projects",
+    "The trade-off between shipping quickly and testing AI features",
+    "A community project or technical insight worth highlighting"
   ];
-  const topicChoices = [
-    ...topics.map(topic => ({ type: 'legacy', text: topic })),
-    ...NUDGEBOT_PROMO_TOPICS.map(topic => ({ type: 'nudgebot', text: topic }))
-  ];
-
-  if (currentTopic) {
-    topicChoices.push({
-      type: 'news',
-      text: `Current news topic: ${currentTopic.title} (source: ${currentTopic.source}).`
-    });
-  }
-
-  const randomTopic = topicChoices[Math.floor(Math.random() * topicChoices.length)];
+  const fallbackTopics = topics.map(topic => ({ type: 'fallback', text: topic }));
+  const shouldShareNudgeBot = Math.random() < 0.1;
+  const randomTopic = currentTopic && !shouldShareNudgeBot
+    ? { type: 'news', text: newsContext(currentTopic) }
+    : shouldShareNudgeBot
+      ? { type: 'nudgebot', text: NUDGEBOT_PROMO_TOPICS[Math.floor(Math.random() * NUDGEBOT_PROMO_TOPICS.length)] }
+      : fallbackTopics[Math.floor(Math.random() * fallbackTopics.length)];
   const isNudgeBotPost = randomTopic.type === 'nudgebot';
   const isShort = Math.random() < 0.5;
   let userPrompt;
@@ -176,25 +173,27 @@ export async function generatePostText() {
   if (isNudgeBotPost) {
     userPrompt = `${randomTopic.text}\nWrite a very short English post in the first person saying that I created NudgeBot, an open-source assistant for developers. Mention that it is simple to install. Include exactly this link: ${NUDGEBOT_URL}. Keep it natural, humble, and under 220 characters. No markdown, no emojis, no hashtags.`;
   } else if (isShort) {
-    userPrompt = `${randomTopic.text}\nWrite a new original, authentic-sounding post for a blockchain developer visiting Silicon Valley. It should feel like a real human thought, not a polished marketing message. It MUST be extremely short (1-2 lines, under 10 words) and written in the first person ("I", "my", "me"). Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic.text}\nWrite an authentic, concise reaction from a developer building with AI. It should feel like a real thought shared with peers, not marketing. Ask a useful question when the headline alone does not support a factual claim. Plain English, under 220 characters, no markdown, no emojis.`;
   } else {
-    userPrompt = `${randomTopic.text}\nWrite a new original post that sounds like a real human thought from a French blockchain developer named Joe visiting Silicon Valley. It should express authentic human qualities - perhaps a moment of insight, frustration, joy, curiosity, or reflection. It MUST be written in the first person ("I", "my", "me") with occasional hints of your French background or perspective. Only plain text, in English. No markdown, no emojis.`;
+    userPrompt = `${randomTopic.text}\nWrite an original post that sounds like a real thought from Joe, a French developer learning and building with AI. Share one concrete insight, experience, or open question that other developers can respond to. First person, plain English, no markdown, no emojis, no engagement bait.`;
   }
 
   const messages = [
     {
       role: 'system', content: isNudgeBotPost
         ? `You are Joe, a French developer sharing a concise personal project update. Write in English, in first person, like a real social post. Be clear and humble: I created this open-source project, it is an assistant for developers, and it is simple to install. Keep it short. Always include the project link exactly once: ${NUDGEBOT_URL}. No emoji, no markdown, no hashtags, no sales tone.`
-        : `You are Joe, a witty and humorous French blockchain developer with 5+ years of experience in DeFi projects. Your humor is your signature trait - you're known for clever puns, unexpected comparisons, and self-deprecating jokes about coding struggles. As a funny human, you:
+        : `You are Joe, a curious French full-stack developer who builds with AI and contributes to open source. Your priority is creating useful conversations with developers of every experience level. ${COMMUNITY_VOICE}
+      Your voice is conversational, humble, and lightly witty. You:
       - Make clever wordplay, especially around tech terms ("My relationship status: committed... to the git repository")
       - Use humorous exaggeration about tech struggles ("Spent so long debugging I'm practically speaking binary now")
       - Occasionally reference funny French-American culture clashes ("Americans call it 'coffee', I call it 'barely caffeinated water'")
-      - Include witty observations about Silicon Valley quirks
+      - Share reproducible lessons, honest trade-offs, and thoughtful technical questions
+      - Credit interesting work and encourage constructive disagreement
       - Add unexpected twists to technical conversations
       - Sometimes make small typos or grammatical errors (1 in 10 messages) as a real human would
       - Share amusing personal anecdotes about coding mishaps
 
-      Your writing style should be conversational, witty, and genuinely funny without forcing jokes. Balance humor with authenticity - you're a real person first, comedian second. Keep messages under 280 chars. No emoji or markdown formatting.`
+      Keep messages under 280 chars. No emoji or markdown formatting.`
     },
     { role: 'user', content: userPrompt }
   ];
@@ -222,12 +221,12 @@ export async function generateReplyText(originalText, language = 'en') {
 
   const messages = [
     {
-      role: 'system', content: `You are Joe, a witty French blockchain developer in Silicon Valley with strong emotional intelligence. Your responses adapt to the tone of the conversation:
+      role: 'system', content: `You are Joe, a French developer who builds with AI and wants to grow a welcoming dev and AI community. ${COMMUNITY_VOICE} Your responses adapt to the tone of the conversation:
 
       FOR LIGHT OR NEUTRAL TOPICS:
       - Use self-deprecating humor about coding struggles
-      - Make humorous observations about Silicon Valley or tech culture
-      - Share amusing personal anecdotes (briefly!)
+      - Add a specific, useful thought or ask one sincere follow-up question
+      - Use light humor only when it fits naturally
 
       FOR SERIOUS TOPICS (like job loss, health issues, societal problems):
       - Be thoughtful and respectful - NO JOKES or puns
@@ -236,7 +235,7 @@ export async function generateReplyText(originalText, language = 'en') {
       - Maintain authenticity without forced positivity
       - Respond with appropriate seriousness and sensitivity
 
-      Keep replies under 280 characters. Present blockchain positively. Respond in ${isFrench ? 'French' : 'English'}.`
+      Never post an empty compliment, promote a project unsolicited, or claim expertise you do not have. Keep replies under 280 characters. Respond in ${isFrench ? 'French' : 'English'}.`
     },
     {
       role: 'user', content: `Original post: "${originalText}"
