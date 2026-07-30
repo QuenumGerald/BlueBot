@@ -48,8 +48,8 @@ jobs.schedule(async () => {
   maxRuns: 3650,
 });
 
-// 3 posts texte courts (sans image) chaque jour à 9h, 13h et 17h
-const postTextHours = [9, 13, 17, 21, 22, 23]; // 3 posts texte par jour
+// Posts texte courts (sans image) répartis dans la journée.
+const postTextHours = [9, 13, 17, 21, 22, 23];
 for (const hour of postTextHours) {
   jobs.schedule(async () => {
     try {
@@ -71,22 +71,21 @@ for (const hour of postTextHours) {
 }
 
 
-// Like/follow maximal (25 posts/hashtag) à 7h et 19h sur hashtags acheteurs potentiels
+// Découverte raisonnée de contributeurs et de discussions dev/IA.
 const projectCollabHashtags =
-  [ // Blockchain & Web3
-    // Open-source & Collaboration
-    // Silicon Valley
-    'siliconvalley', 'sanfrancisco', 'bayarea', 'startups', 'techcommunity',
-    // Tech skills
+  [
+    'opensource', 'developers', 'programming', 'devcommunity',
+    'artificialintelligence', 'machinelearning', 'llm', 'buildinpublic',
+    'typescript', 'rustlang',
   ];
 
-// Configuration spéciale pour les contributions et le networking à Silicon Valley (15 juillet - 2 septembre 2025)
+// Créneaux de publication et d'échange avec la communauté.
 const replyHours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]; // 12 créneaux pour plus de replies
 const likeFollowHours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; // 6 créneaux, maxPerJob augmenté
-const maxPerJob = 3; // 3 posts/hashtag/jobœ pour +50%
-const delayMs = 3000; // délai inchangé
+const maxPerJob = 3;
+const delayMs = 3000;
 
-// Planification auto-reply pour la recherche d'emploi (réponse aux opportunités)
+// Planification des réponses aux discussions dev/IA.
 import { autoReply } from './autoReply.js';
 for (const hour of replyHours) {
   jobs.schedule(async () => {

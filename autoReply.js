@@ -1,5 +1,5 @@
 // autoReply.js
-// Répond automatiquement aux posts pertinents pour la recherche d'emploi à Silicon Valley
+// Participe aux conversations pertinentes de la communauté dev et IA.
 
 import { agent, initBluesky } from './bluesky.js';
 import { generateReplyText } from './generateText.js';
@@ -111,7 +111,7 @@ function hasRepliedRecently(did, uri, history) {
 }
 
 /**
- * Recherche les 10 derniers posts #CLIPPY et y répond de façon IA
+ * Recherche des discussions dev/IA récentes et y répond de façon utile.
  */
 export async function autoReply() {
   try {
@@ -137,13 +137,11 @@ export async function autoReply() {
     const MAX_REPLIES_PER_RUN = 5; // Limite raisonnable pour éviter le spam
     // Authentifie l'agent Bluesky avant toute requête
     await initBluesky();
-    // Termes de recherche pour trouver des posts pertinents pour la recherche d'emploi
+    // Sujets assez précis pour trouver des conversations où apporter de la valeur.
     const searchTerms = [
-
-      // Termes liés à Silicon Valley
-      'silicon valley', 'san francisco', 'bay area', 'sf tech', 'palo alto',
-      'sunnyvale', 'cupertino',
-
+      'open source AI', 'AI developer', 'LLM evaluation', 'AI coding',
+      'developer tools', 'TypeScript', 'Rust lang', 'machine learning',
+      'build in public', 'dev community',
     ];
 
     // Récupère les posts récents contenant les termes de recherche
@@ -262,4 +260,3 @@ export async function autoReply() {
     console.error('[Erreur][autoReply] Erreur globale dans autoReply :', error?.response?.data || error.message);
   }
 }
-

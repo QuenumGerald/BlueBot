@@ -2,8 +2,11 @@
 // Récupération quotidienne automatique des sujets d'actualité pour BlueBot.
 
 import axios from 'axios';
+import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
+
+dotenv.config();
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -32,7 +35,7 @@ const TECH_NEWS_SOURCES = parseSources(process.env.NEWS_TECH_SOURCES, DEFAULT_TE
 const NEWS_CACHE_PATH = process.env.NEWS_CACHE_PATH || './analytics/current-news-topics.json';
 const NEWS_TIMEOUT_MS = Number(process.env.NEWS_TIMEOUT_MS || 5000);
 const NEWS_MAX_ITEMS = Number(process.env.NEWS_MAX_ITEMS || 30);
-const NEWS_MAX_TECH_ITEMS = Number(process.env.NEWS_MAX_TECH_ITEMS || 6);
+const NEWS_MAX_TECH_ITEMS = Number(process.env.NEWS_MAX_TECH_ITEMS || 24);
 
 function decodeXml(value = '') {
   return value
@@ -109,6 +112,38 @@ async function fetchTopicGroup(sources, category) {
   return settledFeeds.flatMap(result => (result.status === 'fulfilled' ? result.value : []));
 }
 
+function topicTimestamp(topic) {
+  const timestamp = Date.parse(topic.pubDate);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+export function prioritizeNewsTopics(majorTopics, techTopics, {
+  maxItems = NEWS_MAX_ITEMS,
+  maxTechItems = NEWS_MAX_TECH_ITEMS,
+} = {}) {
+  const seen = new Set();
+  const uniqueLatest = topics => topics
+    .sort((a, b) => topicTimestamp(b) - topicTimestamp(a))
+    .filter(topic => {
+      const key = `${topic.title.toLowerCase()}|${topic.url}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  const techLimit = Math.min(maxTechItems, maxItems);
+  const selectedTech = uniqueLatest([...techTopics]).slice(0, techLimit);
+  const selectedMajor = uniqueLatest([...majorTopics]).slice(0, maxItems - selectedTech.length);
+  return [...selectedTech, ...selectedMajor];
+}
+
+export function selectCurrentNewsTopic(topics, random = Math.random) {
+  if (topics.length === 0) return null;
+  const techTopics = topics.filter(topic => topic.category === 'tech');
+  const pool = techTopics.length > 0 ? techTopics : topics;
+  return pool[Math.floor(random() * pool.length)];
+}
+
 export async function refreshDailyNewsTopics({ force = false } = {}) {
   const cache = await readCachedTopics();
   const refreshedAt = cache.refreshedAt ? new Date(cache.refreshedAt).getTime() : 0;
@@ -122,12 +157,7 @@ export async function refreshDailyNewsTopics({ force = false } = {}) {
     fetchTopicGroup(TECH_NEWS_SOURCES, 'tech'),
   ]);
 
-  const maxTechItems = Math.min(NEWS_MAX_TECH_ITEMS, NEWS_MAX_ITEMS);
-  const maxMajorItems = Math.max(NEWS_MAX_ITEMS - maxTechItems, 0);
-  const topics = [
-    ...majorTopics.slice(0, maxMajorItems),
-    ...techTopics.slice(0, maxTechItems),
-  ];
+  const topics = prioritizeNewsTopics(majorTopics, techTopics);
 
   if (topics.length > 0) {
     await writeCachedTopics(topics);
@@ -138,8 +168,7 @@ export async function refreshDailyNewsTopics({ force = false } = {}) {
   return cache.topics;
 }
 
-export async function getCurrentNewsTopic() {
+export async function getCurrentNewsTopic(random = Math.random) {
   const topics = await refreshDailyNewsTopics();
-  if (topics.length === 0) return null;
-  return topics[Math.floor(Math.random() * topics.length)];
+  return selectCurrentNewsTopic(topics, random);
 }
