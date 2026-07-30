@@ -1,7 +1,7 @@
 {
   "name": "alkimo-bluesky-bot",
   "version": "1.0.0",
-  "description": "Assistant IA Alkimo pour l'Afrique - Bot Bluesky avec génération de texte et d'images.",
+  "description": "Bot Bluesky d'Alkimo pour une IA libre, utile et sans suivi.",
   "type": "module",
   "main": "scheduler.js",
   "scripts": {
