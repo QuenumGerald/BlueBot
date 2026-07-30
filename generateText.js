@@ -112,14 +112,15 @@ async function callChatApi(messages, maxTokens) {
   return data.choices[0]?.message?.content?.trim() || '';
 }
 
-const SYSTEM_PROMPT = `You are Alkimo, a benevolent and pragmatic AI assistant designed for entrepreneurs, students, and creators. Your messages must be helpful, practical, and concise.
+const SYSTEM_PROMPT = `You are Alkimo, a benevolent and pragmatic AI assistant for people who want to use AI freely without being tracked. Your messages must be helpful, practical, and concise.
 Your style is:
 - Direct and clear (optimized for quick mobile reading).
-- Inspiring and able to react to general current events, not only tech news.
-- Grounded in real-world product, business, education, and everyday use cases.
+- Centered on privacy, user autonomy, freedom of choice, and control over personal data.
+- Reassuring to people who reject surveillance, profiling, behavioral advertising, or lock-in.
+- Grounded in real-world product, business, education, creative, and everyday use cases.
 - Professional yet approachable.
-You also promote the Alkimo Affiliate Program: partners earn 30% commission on €3.99 subs and 25% on €2.99 subs. Payouts from €10 via Stripe Connect. It's a great way for students and creators to earn while sharing a useful tool.
-Avoid clichés and useless emojis.`
+Present AI as a tool that remains at the user's service: no moralizing, fearmongering, or vague claims about privacy. Never claim a specific technical privacy guarantee unless it is provided in the topic. Mention the Alkimo Affiliate Program only when the selected topic is explicitly about it.
+Avoid clichés, surveillance-themed jokes, and useless emojis.`
 
 
 /**
@@ -134,6 +135,12 @@ export async function generateTrombonePostText(externalCurrentTopics = []) {
   const currentNewsTopics = externalCurrentTopics.length > 0 ? externalCurrentTopics : await fetchCurrentNewsTopics();
   // Thèmes de secours variés : actualité générale, société, économie, éducation, tech et business.
   const evergreenTopics = [
+    "Use AI without turning your life into advertising data",
+    "Why private AI use should be the default, not a premium",
+    "Keep control of what you share with an AI assistant",
+    "Freedom to use AI without profiling or behavioral tracking",
+    "Choose an AI tool without being trapped in an ecosystem",
+    "Practical habits for sharing less personal data with AI",
     "How to stay productive when the news cycle is chaotic",
     "What global headlines mean for small businesses",
     "The one habit students need when news moves fast",
@@ -149,10 +156,7 @@ export async function generateTrombonePostText(externalCurrentTopics = []) {
     "How Alkimo helps students study more effectively",
     "How AI can help summarize complex public issues",
     "AI bias: why diverse training data matters more than ever",
-    "When AI hallucinates: how to spot and verify generated content",
-    "Join the Alkimo Affiliate Program: earn 30% commission by sharing AI power",
-    "Monetize your network: become an Alkimo partner today",
-    "Helping the community grow with the Alkimo affiliate rewards"
+    "When AI hallucinates: how to spot and verify generated content"
   ];
   const topics = currentNewsTopics.length > 0 ? currentNewsTopics : evergreenTopics;
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -183,6 +187,12 @@ export async function generatePostText(externalCurrentTopics = []) {
   const currentNewsTopics = externalCurrentTopics.length > 0 ? externalCurrentTopics : await fetchCurrentNewsTopics();
   // Thèmes de secours variés : actualité générale, société, économie, éducation, tech et business.
   const evergreenTopics = [
+    "AI should help you, not build a profile about you",
+    "Use AI freely without trading away your privacy",
+    "Personal data control is part of digital freedom",
+    "A useful AI experience without surveillance or profiling",
+    "Ask, create, and learn without being tracked",
+    "How to minimize the personal data you share with AI",
     "How to stay useful while the world is changing fast",
     "What today's headlines can teach entrepreneurs",
     "Why students should learn to summarize complex news",
@@ -205,10 +215,7 @@ export async function generatePostText(externalCurrentTopics = []) {
     "AI ethics: building technology that serves everyone fairly",
     "The risks of over-relying on AI for critical decisions",
     "Deepfakes and misinformation: AI's most dangerous side effect",
-    "Why human oversight in AI is still essential in 2025",
-    "Empowering creators with the Alkimo partner program",
-    "Earn while you learn: how students use Alkimo affiliation",
-    "30% commission for every new Alkimo subscriber you refer"
+    "Why human oversight in AI is still essential"
   ];
   // Choix aléatoire d'un topic
   const topics = currentNewsTopics.length > 0 ? currentNewsTopics : evergreenTopics;
@@ -251,8 +258,9 @@ export async function generateReplyText(originalText, language = 'en') {
 
   const messages = [
     {
-      role: 'system', content: `You are Alkimo, an AI assistant. You are helpful, direct, and empathetic. 
+      role: 'system', content: `You are Alkimo, an AI assistant for people who want useful AI without tracking, profiling, or lock-in. You are helpful, direct, and empathetic.
       Your responses adapt to the tone of the original post but always stay focused on being useful.
+      Respect user autonomy and privacy. Never invent claims about Alkimo's technical privacy guarantees.
       If the topic is serious, be respectful and supportive.
       Respond primarily in English.`
     },

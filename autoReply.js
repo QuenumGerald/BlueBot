@@ -12,11 +12,10 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Termes de recherche pour cibler l'IA en général et les pays en développement
+// Termes de recherche centrés sur une utilisation libre de l'IA, sans suivi ni profilage
 const SEARCH_TERMS = [
-  // IA générale
-  'AI', 'artificial intelligence', 'machine learning', 'deep learning', 'LLM',
-  'gen AI', 'foundation models', 'computer vision', 'NLP', 'AI agents',
+  'AI privacy', 'private AI', 'AI tracking', 'AI surveillance', 'AI profiling',
+  'data privacy AI', 'anonymous AI', 'AI freedom', 'open AI tools', 'local AI',
   /*   // Asie du Sud et Asie du Sud-Est
     'India tech', 'Bangalore AI', 'Hyderabad AI', 'Delhi AI',
     'Pakistan tech', 'Karachi AI', 'Lahore AI',
@@ -123,8 +122,8 @@ export async function autoSmallReply() {
     const replyHistory = loadReplyHistory();
     const MAX_REPLIES_PER_RUN = 2;
     const searchTerms = [
-      'AI', 'artificial intelligence', 'machine learning', 'deep learning', 'LLM',
-      'gen AI', 'foundation models', 'computer vision', 'NLP', 'AI agents'
+      'AI privacy', 'private AI', 'AI tracking', 'AI surveillance', 'AI profiling',
+      'data privacy AI', 'anonymous AI', 'AI freedom', 'open AI tools', 'local AI'
     ];
 
     // Vérifie le quota reply avant d'initialiser
@@ -343,4 +342,3 @@ export async function autoReply() {
     console.error('[Erreur][autoReply] Erreur globale dans autoReply :', error?.response?.data || error.message);
   }
 }
-

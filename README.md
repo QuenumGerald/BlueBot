@@ -1,6 +1,8 @@
 # 🤖 Clippy Bluesky Bot
 
-Bot Bluesky complet en Node.js/ESM pour générer, poster, liker, suivre et répondre automatiquement avec des memes IA de Clippy !
+Bot Bluesky en Node.js/ESM qui porte une vision simple : chacun doit pouvoir utiliser l’IA librement, sans suivi, profilage publicitaire ni enfermement dans un écosystème.
+
+Le discours d’Alkimo s’adresse en priorité aux personnes qui veulent garder le contrôle de leurs données et de leurs choix. Le bot publie des conseils concrets autour d’une IA utile et respectueuse de l’autonomie, sans inventer de garanties techniques de confidentialité.
 
 ## Sommaire
 - [Fonctionnalités](#fonctionnalités)
@@ -16,6 +18,8 @@ Bot Bluesky complet en Node.js/ESM pour générer, poster, liker, suivre et rép
 ---
 
 ## Fonctionnalités
+- **Prise de parole axée vie privée et liberté d’usage** : autonomie, contrôle des données, absence de profilage et choix des outils
+- **Veille ciblée** sur les conversations liées à la confidentialité, au suivi et aux alternatives ouvertes ou locales
 - **Génération d’images memes Clippy** via l’API Hugging Face (Stable Diffusion)
 - **Génération de textes posts et replies** via DeepSeek ou OpenAI (GPT)
 - **Publication automatique** sur Bluesky (texte + image)
